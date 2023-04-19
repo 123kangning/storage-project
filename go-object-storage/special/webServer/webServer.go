@@ -20,7 +20,7 @@ func main() {
 	http.HandleFunc("/", listHandler)
 	http.HandleFunc("/upload", uploadHandler)
 	http.HandleFunc("/download", downloadHandler)
-	log.Fatal(http.ListenAndServe(":8000", nil))
+	log.Fatal(http.ListenAndServe(os.Getenv("WEB_SERVER_ADDRESS"), nil))
 }
 
 type Metadata struct {

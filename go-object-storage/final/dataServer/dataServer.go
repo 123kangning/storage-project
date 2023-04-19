@@ -16,5 +16,5 @@ func main() {
 	go locate.StartLocate()
 	http.HandleFunc("/objects/", objects.Handler)
 	http.HandleFunc("/temp/", temp.Handler)
-	log.Fatal(http.ListenAndServe(os.Getenv("LISTEN_ADDRESS"), nil))
+	log.Fatal(http.ListenAndServe(os.Getenv("LISTEN_ADDRESS1"), nil))
 }

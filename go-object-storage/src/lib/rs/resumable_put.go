@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"lib/objectstream"
-	"lib/utils"
 	"log"
 	"net/http"
+	"project/go-object-storage/src/lib/objectstream"
+	"project/go-object-storage/src/lib/utils"
 )
 
 type resumableToken struct {

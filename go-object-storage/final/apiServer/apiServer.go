@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -20,5 +21,7 @@ func main() {
 	http.HandleFunc("/temp/", temp.Handler)
 	http.HandleFunc("/locate/", locate.Handler)
 	http.HandleFunc("/versions/", versions.Handler)
+	fmt.Println(1)
 	log.Fatal(http.ListenAndServe(os.Getenv("LISTEN_ADDRESS"), nil))
+	fmt.Println(2)
 }

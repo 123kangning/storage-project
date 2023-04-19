@@ -2,7 +2,7 @@ package rs
 
 import (
 	"io"
-	"lib/objectstream"
+	"project/go-object-storage/src/lib/objectstream"
 )
 
 type RSResumableGetStream struct {
