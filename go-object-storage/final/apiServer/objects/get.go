@@ -54,6 +54,7 @@ func get(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("content-range", fmt.Sprintf("bytes %d-%d/%d", offset, meta.Size-1, meta.Size))
 		w.WriteHeader(http.StatusPartialContent)
 	}
+	//可选 gzip进行压缩
 	acceptGzip := false
 	encoding := r.Header["Accept-Encoding"]
 	for i := range encoding {

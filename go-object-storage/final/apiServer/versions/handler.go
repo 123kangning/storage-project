@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func Handler(w http.ResponseWriter, r *http.Request) {
+func Handler(w http.ResponseWriter, r *http.Request) { //获取所有的Metadata集合
 	m := r.Method
 	if m != http.MethodGet {
 		w.WriteHeader(http.StatusMethodNotAllowed)

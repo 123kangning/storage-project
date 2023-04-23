@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -17,11 +16,9 @@ import (
  */
 func main() {
 	go heartbeat.ListenHeartbeat()
-	http.HandleFunc("/objects/", objects.Handler)
+	http.HandleFunc("/objects/", objects.Handler) //webServer中的uploadHandler、downloadHandler调用
 	http.HandleFunc("/temp/", temp.Handler)
 	http.HandleFunc("/locate/", locate.Handler)
 	http.HandleFunc("/versions/", versions.Handler)
-	fmt.Println(1)
 	log.Fatal(http.ListenAndServe(os.Getenv("LISTEN_ADDRESS"), nil))
-	fmt.Println(2)
 }

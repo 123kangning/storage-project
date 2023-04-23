@@ -11,11 +11,11 @@ type RSPutStream struct {
 }
 
 func NewRSPutStream(dataServers []string, hash string, size int64) (*RSPutStream, error) {
-	if len(dataServers) != ALL_SHARDS {
+	if len(dataServers) != ALL_SHARDS { // 如果参数中的数据服务节点数量小于最低标准，则无法存储数据
 		return nil, fmt.Errorf("dataServers number mismatch")
 	}
 
-	perShard := (size + DATA_SHARDS - 1) / DATA_SHARDS
+	perShard := (size + DATA_SHARDS - 1) / DATA_SHARDS //数据分片，每一个数据片的大小
 	writers := make([]io.Writer, ALL_SHARDS)
 	var e error
 	for i := range writers {
@@ -25,8 +25,8 @@ func NewRSPutStream(dataServers []string, hash string, size int64) (*RSPutStream
 			return nil, e
 		}
 	}
+	//生成RS编码器对象
 	enc := NewEncoder(writers)
-
 	return &RSPutStream{enc}, nil
 }
 

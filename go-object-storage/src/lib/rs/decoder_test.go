@@ -25,7 +25,6 @@ func testEncodeDecode(t *testing.T, p []byte) {
 		}
 		count += n
 	}
-	enc.Close()
 	for i := range writers {
 		writers[i].(*os.File).Close()
 		writers[i] = nil

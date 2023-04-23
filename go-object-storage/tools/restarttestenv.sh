@@ -1,4 +1,4 @@
 #!/bin/bash
 
-tools/stoptestenv.sh
-tools/starttestenv.sh $1
+sh stoptestenv.sh
+sh starttestenv.sh

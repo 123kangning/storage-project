@@ -1,5 +1,6 @@
 package objectstream
 
+//该文件中内容已废除
 import (
 	"fmt"
 	"io"

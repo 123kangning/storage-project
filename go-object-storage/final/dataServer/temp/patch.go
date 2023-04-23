@@ -3,7 +3,6 @@ package temp
 import (
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -27,7 +26,7 @@ func patch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer f.Close()
-	_, e = io.Copy(f, r.Body)
+	_, e = io.Copy(f, r.Body) //追加到uuid.dat文件中
 	if e != nil {
 		log.Println(e)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -54,7 +53,7 @@ func readFromFile(uuid string) (*tempInfo, error) {
 		return nil, e
 	}
 	defer f.Close()
-	b, _ := ioutil.ReadAll(f)
+	b, _ := io.ReadAll(f)
 	var info tempInfo
 	json.Unmarshal(b, &info)
 	return &info, nil

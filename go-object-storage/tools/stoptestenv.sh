@@ -2,3 +2,4 @@
 
 killall apiServer
 killall dataServer
+killall webServer

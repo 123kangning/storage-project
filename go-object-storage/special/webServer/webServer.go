@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -58,18 +57,19 @@ type Sizer interface {
 }
 
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
-	f, header, e := r.FormFile("upload")
+	f, header, e := r.FormFile("upload") //从http请求的Body中获取upload字段的文件
 	if e != nil {
 		log.Println(e)
 		return
 	}
 	defer f.Close()
-	h := sha256.New()
-	io.Copy(h, f)
-	d := base64.StdEncoding.EncodeToString(h.Sum(nil))
+	h := sha256.New()                                  //生成hash对象
+	io.Copy(h, f)                                      //写入待上传文件内容至hash对象中
+	d := base64.StdEncoding.EncodeToString(h.Sum(nil)) //生成hash字符串
 	log.Println(d)
 	f.Seek(0, 0)
-	dat, _ := ioutil.ReadAll(f)
+	dat, _ := io.ReadAll(f)
+	//构造上传文件的request请求
 	req, e := http.NewRequest("PUT", "http://"+os.Getenv("API_SERVER")+"/objects/"+url.PathEscape(header.Filename), bytes.NewBuffer(dat))
 	if e != nil {
 		log.Println(e)
@@ -78,6 +78,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	req.Header.Set("digest", "SHA-256="+d)
 	client := http.Client{}
 	log.Println("uploading file", header.Filename, "hash", d, "size", f.(Sizer).Size())
+	//发送request请求至 apiServer
 	_, e = client.Do(req)
 	if e != nil {
 		log.Println(e)
@@ -85,6 +86,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("uploaded")
 	time.Sleep(time.Second)
+	//将客户端重定向到主界面
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 

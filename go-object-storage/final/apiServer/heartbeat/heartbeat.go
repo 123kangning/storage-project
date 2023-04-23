@@ -9,7 +9,7 @@ import (
 )
 
 var dataServers = make(map[string]time.Time) //保存所有的数据缓存节点
-var mutex sync.Mutex                         //处理并发的锁
+var mutex sync.RWMutex                       //处理并发的锁
 
 // ListenHeartbeat
 /**
@@ -22,7 +22,9 @@ func ListenHeartbeat() {
 	defer q.Close()
 	q.Bind("apiServers")
 	c := q.Consume()
+	// 移除过期节点
 	go removeExpiredDataServer()
+	// 监听数据服务节点心跳，将心跳信息写入全局缓存
 	for msg := range c {
 		dataServer, e := strconv.Unquote(string(msg.Body))
 		if e != nil {
@@ -30,15 +32,16 @@ func ListenHeartbeat() {
 		}
 		mutex.Lock() //记得加锁
 		dataServers[dataServer] = time.Now()
-		mutex.Unlock() //并发的东西都要加锁，当然这种方法比较暴力，可以用读写锁或者channel来优化
+		mutex.Unlock()
 	}
 }
 
-/**
- * @Description: 移除过期的节点
-		每五秒都把那些超过10秒没有收到心跳消息的节点给删掉
-		这个函数因为是死循环所以不能放在主线程执行，一会单开一个goroutine来执行
-		涉及到并发所以同样加锁
+/*
+*
+  - @Description: 移除过期的节点
+    每五秒都把那些超过10秒没有收到心跳消息的节点给删掉
+    这个函数因为是死循环所以不能放在主线程执行，一会单开一个goroutine来执行
+    涉及到并发所以同样加锁
 */
 func removeExpiredDataServer() {
 	for {
@@ -53,6 +56,7 @@ func removeExpiredDataServer() {
 	}
 }
 
+// GetDataServers
 /**
  * @Description: 返回当前的数据节点
  * @return []string

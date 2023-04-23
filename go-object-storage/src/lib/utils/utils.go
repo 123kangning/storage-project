@@ -38,6 +38,7 @@ func GetSizeFromHeader(h http.Header) int64 {
 	return size
 }
 
+// CalculateHash 计算该文件内容的hash值（文件内容从r中读取）
 func CalculateHash(r io.Reader) string {
 	h := sha256.New()
 	io.Copy(h, r)

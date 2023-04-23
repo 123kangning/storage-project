@@ -8,6 +8,7 @@ import (
 	"testing"
 )
 
+// 该文件中内容已废除
 func putHandler(w http.ResponseWriter, r *http.Request) {
 	b, _ := ioutil.ReadAll(r.Body)
 	if string(b) == "test" {

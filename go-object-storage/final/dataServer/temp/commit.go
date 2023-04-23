@@ -28,9 +28,11 @@ func commitTempObject(datFile string, tempinfo *tempInfo) {
 	d := url.PathEscape(utils.CalculateHash(f))
 	f.Seek(0, io.SeekStart)
 	w, _ := os.Create(os.Getenv("STORAGE_ROOT") + "/objects/" + tempinfo.Name + "." + d)
-	w2 := gzip.NewWriter(w)
+	w2 := gzip.NewWriter(w) //将gzip压缩后的文件写入w中
 	io.Copy(w2, f)
 	w2.Close()
+	//删除副本文件
 	os.Remove(datFile)
+	//加入hash-id键值对
 	locate.Add(tempinfo.hash(), tempinfo.id())
 }

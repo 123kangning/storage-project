@@ -22,7 +22,7 @@ func put(w http.ResponseWriter, r *http.Request) {
 	}
 
 	size := utils.GetSizeFromHeader(r.Header) //从头部获取size信息
-	c, e := storeObject(r.Body, hash, size)
+	c, e := storeObject(r.Body, hash, size)   //存储文件到/objects,返回状态码以及error
 	if e != nil {
 		log.Println(e)
 		w.WriteHeader(c)
@@ -34,7 +34,7 @@ func put(w http.ResponseWriter, r *http.Request) {
 	}
 
 	name := strings.Split(r.URL.EscapedPath(), "/")[2] //组成名字
-	e = es.AddVersion(name, hash, size)
+	e = es.AddVersion(name, hash, size)                //更新版本
 	if e != nil {
 		log.Println(e)
 		w.WriteHeader(http.StatusInternalServerError)
