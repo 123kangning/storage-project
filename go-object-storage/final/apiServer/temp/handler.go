@@ -11,6 +11,7 @@ import "net/http"
 func Handler(w http.ResponseWriter, r *http.Request) {
 	m := r.Method
 	if m == http.MethodHead {
+		//检查资源的元数据，但不需要获取资源本身
 		head(w, r)
 		return
 	}

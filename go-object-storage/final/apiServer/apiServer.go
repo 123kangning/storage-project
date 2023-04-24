@@ -17,7 +17,7 @@ import (
 func main() {
 	go heartbeat.ListenHeartbeat()
 	http.HandleFunc("/objects/", objects.Handler) //webServer中的uploadHandler、downloadHandler调用
-	http.HandleFunc("/temp/", temp.Handler)
+	http.HandleFunc("/temp/", temp.Handler)       //和/objects中的post一起看,head只查看，主要看put
 	http.HandleFunc("/locate/", locate.Handler)
 	http.HandleFunc("/versions/", versions.Handler) //webServer中的listHandler调用
 	log.Fatal(http.ListenAndServe(os.Getenv("LISTEN_ADDRESS"), nil))
