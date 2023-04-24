@@ -10,6 +10,7 @@ import (
 )
 
 func patch(w http.ResponseWriter, r *http.Request) {
+	log.Println("patch")
 	uuid := strings.Split(r.URL.EscapedPath(), "/")[2]
 	tempinfo, e := readFromFile(uuid)
 	if e != nil {

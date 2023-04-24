@@ -25,6 +25,7 @@ type tempInfo struct {
 // 创建/temp中的两个文件，一个配置，一个副本
 func post(w http.ResponseWriter, r *http.Request) {
 	//生成uuid
+	log.Println("post")
 	output, _ := exec.Command("uuidgen").Output()
 	uuid := strings.TrimSuffix(string(output), "\n")
 	//name解析出来为[hash.writer分片索引]

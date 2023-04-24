@@ -19,6 +19,6 @@ func main() {
 	http.HandleFunc("/objects/", objects.Handler) //webServer中的uploadHandler、downloadHandler调用
 	http.HandleFunc("/temp/", temp.Handler)
 	http.HandleFunc("/locate/", locate.Handler)
-	http.HandleFunc("/versions/", versions.Handler)
+	http.HandleFunc("/versions/", versions.Handler) //webServer中的listHandler调用
 	log.Fatal(http.ListenAndServe(os.Getenv("LISTEN_ADDRESS"), nil))
 }

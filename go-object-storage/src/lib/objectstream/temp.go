@@ -3,6 +3,7 @@ package objectstream
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -14,6 +15,7 @@ type TempPutStream struct {
 
 // NewTempPutStream 向dataServer的/temp发送POST请求，创建文件（不写入内容），object为[hash.writer分片索引]
 func NewTempPutStream(server, object string, size int64) (*TempPutStream, error) {
+	log.Println("api.objects.NewTempPutStream")
 	request, e := http.NewRequest("POST", "http://"+server+"/temp/"+object, nil)
 	if e != nil {
 		return nil, e

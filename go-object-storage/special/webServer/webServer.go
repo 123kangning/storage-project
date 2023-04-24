@@ -57,6 +57,7 @@ type Sizer interface {
 }
 
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("upload")
 	f, header, e := r.FormFile("upload") //从http请求的Body中获取upload字段的文件
 	if e != nil {
 		log.Println(e)
@@ -91,6 +92,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func downloadHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("download")
 	req, e := http.Get("http://" + os.Getenv("API_SERVER") + "/objects/" + url.PathEscape(r.URL.Query()["name"][0]) + "?version=" + r.URL.Query()["version"][0])
 	if e != nil {
 		log.Println(e)

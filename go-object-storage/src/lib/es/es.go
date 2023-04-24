@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	url2 "net/url"
 	"os"
@@ -54,6 +55,7 @@ func getMetadata(name string, versionId int) (meta Metadata, e error) {
 func SearchLatestVersion(name string) (meta Metadata, e error) {
 	url := fmt.Sprintf("http://%s/metadata/_search?q=name:%s&size=1&sort=version:desc",
 		os.Getenv("ES_SERVER"), url2.PathEscape(name))
+	log.Println("url = ", url)
 	r, e := http.Get(url)
 	if e != nil {
 		return
@@ -68,6 +70,7 @@ func SearchLatestVersion(name string) (meta Metadata, e error) {
 	if len(sr.Hits.Hits) != 0 {
 		meta = sr.Hits.Hits[0].Source
 	}
+
 	return
 }
 
@@ -154,5 +157,6 @@ func SearchAllVersions(name string, from, size int) ([]Metadata, error) {
 	for i := range sr.Hits.Hits {
 		metas = append(metas, sr.Hits.Hits[i].Source)
 	}
+	log.Println(metas)
 	return metas, nil
 }

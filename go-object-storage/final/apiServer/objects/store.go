@@ -3,6 +3,7 @@ package objects
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"project/go-object-storage/final/apiServer/locate"
@@ -10,7 +11,9 @@ import (
 )
 
 func storeObject(r io.Reader, hash string, size int64) (int, error) {
+	log.Println("api.objects.storeObject")
 	if locate.Exist(url.PathEscape(hash)) { //如果该对象已经存在，直接返回
+		log.Println("api.objects.storeObject1")
 		return http.StatusOK, nil
 	}
 	//调用dataServer POST创建文件，但不写入 获取接口服务节点存储对象的流

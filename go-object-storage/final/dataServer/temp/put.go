@@ -9,6 +9,7 @@ import (
 
 // 文件在数据层真正的put过程
 func put(w http.ResponseWriter, r *http.Request) {
+	log.Println("put")
 	//uuid为[hash.writer分片索引]
 	uuid := strings.Split(r.URL.EscapedPath(), "/")[2]
 	// 读取临时文件信息反序列化为结构体
