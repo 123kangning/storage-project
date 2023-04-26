@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func sendFile(w io.Writer, file string) {
+func SendFile(w io.Writer, file string) {
 	f, e := os.Open(file)
 	if e != nil {
 		log.Println(e)

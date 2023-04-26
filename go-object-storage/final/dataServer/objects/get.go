@@ -12,5 +12,5 @@ func get(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	sendFile(w, file)
+	SendFile(w, file)
 }

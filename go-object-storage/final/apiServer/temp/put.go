@@ -48,20 +48,24 @@ func put(w http.ResponseWriter, r *http.Request) {
 		if n != rs.BLOCK_SIZE && current != stream.Size {
 			return
 		}
+		//写入enc.cache缓冲区中
 		stream.Write(bytes[:n])
 		if current == stream.Size {
+			//发送patch调用，写入dataServer
 			stream.Flush()
 			getStream, e := rs.NewRSResumableGetStream(stream.Servers, stream.Uuids, stream.Size)
 			hash := url.PathEscape(utils.CalculateHash(getStream))
 			if hash != stream.Hash {
+				//回退
 				stream.Commit(false)
 				log.Println("resumable put done but hash mismatch")
 				w.WriteHeader(http.StatusForbidden)
 				return
 			}
-			if locate.Exist(url.PathEscape(hash)) {
-				stream.Commit(false)
+			if locate.Exist(url.PathEscape(hash)) { //判断至少四个数据节点是否保存了该数据
+				stream.Commit(false) //回退，已经保存了该数据
 			} else {
+				//提交
 				stream.Commit(true)
 			}
 			e = es.AddVersion(stream.Name, stream.Hash, stream.Size)

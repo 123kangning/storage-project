@@ -24,5 +24,16 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		del(w, r)
 		return
 	}
+	// HEAD 查看文件状态
+	if m == http.MethodHead {
+		head(w, r)
+		return
+	}
+	// GET 查看文件状态
+	if m == http.MethodGet {
+		get(w, r)
+		return
+	}
+
 	w.WriteHeader(http.StatusMethodNotAllowed)
 }

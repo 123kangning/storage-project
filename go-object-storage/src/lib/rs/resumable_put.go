@@ -24,6 +24,7 @@ type RSResumablePutStream struct {
 	*resumableToken
 }
 
+// NewRSResumablePutStream 将元数据 name,size,hash,[]server与[]uuid 放入Token中，将Token和RSPutStream集成到RSResumablePutStream中
 func NewRSResumablePutStream(dataServers []string, name, hash string, size int64) (*RSResumablePutStream, error) {
 	putStream, e := NewRSPutStream(dataServers, hash, size)
 	if e != nil {
@@ -37,6 +38,7 @@ func NewRSResumablePutStream(dataServers []string, name, hash string, size int64
 	return &RSResumablePutStream{putStream, token}, nil
 }
 
+// NewRSResumablePutStreamFromToken 用Token还原出对应的的文件流，写入文件时同样是向dataServer发送patch请求
 func NewRSResumablePutStreamFromToken(token string) (*RSResumablePutStream, error) {
 	b, e := base64.StdEncoding.DecodeString(token)
 	if e != nil {
@@ -51,12 +53,13 @@ func NewRSResumablePutStreamFromToken(token string) (*RSResumablePutStream, erro
 
 	writers := make([]io.Writer, ALL_SHARDS)
 	for i := range writers {
-		writers[i] = &objectstream.TempPutStream{t.Servers[i], t.Uuids[i]}
+		writers[i] = &objectstream.TempPutStream{Server: t.Servers[i], Uuid: t.Uuids[i]}
 	}
 	enc := NewEncoder(writers)
 	return &RSResumablePutStream{&RSPutStream{enc}, &t}, nil
 }
 
+// ToToken 之后用Token进行分片发送文件
 func (s *RSResumablePutStream) ToToken() string {
 	b, _ := json.Marshal(s)
 	return base64.StdEncoding.EncodeToString(b)

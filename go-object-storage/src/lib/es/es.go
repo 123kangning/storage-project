@@ -1,14 +1,13 @@
 package es
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
-	"io"
+	"github.com/olivere/elastic/v7"
 	"log"
-	"net/http"
-	url2 "net/url"
-	"os"
-	"strings"
+	"runtime"
 )
 
 type Metadata struct { //元数据结构体 包含名称、版本、size、哈希值
@@ -18,66 +17,88 @@ type Metadata struct { //元数据结构体 包含名称、版本、size、哈�
 	Hash    string
 }
 
-type hit struct {
-	Source Metadata `json:"_source"`
+var (
+	client *elastic.Client
+	url    = "http://localhost:9200"
+	ctx    = context.Background()
+)
+
+func Init() {
+	var err error
+	client, err = elastic.NewClient(
+		elastic.SetURL(url),
+		elastic.SetSniff(false),
+	)
+	if err != nil {
+		log.Println("连接es失败", err)
+	}
+	log.Println(elastic.Version)
+	log.Println(client)
 }
 
-type searchResult struct {
-	Hits struct {
-		Total int
-		Hits  []hit
+// 按照名称+版本作为索引返回一个元数据
+func getMetadata(name string, version int) (meta Metadata, e error) {
+	index := fmt.Sprintf("%s_%d", name, version)
+	indexExists, err := client.IndexExists(index).Do(ctx)
+	if err != nil {
+		log.Println("Error checking index existence: ", err)
+		return Metadata{}, errors.New(fmt.Sprintf("Error checking index existence: %s ", err))
+	} else if !indexExists {
+		log.Println("Index doesn't exist: ", index)
+		return Metadata{}, errors.New(fmt.Sprintf("Index doesn't exist: %s ", index))
 	}
+	result, err := client.Get().Index(index).Id("1").Do(ctx)
+	if err != nil {
+		log.Println("Error getting document: ", err)
+		return Metadata{}, errors.New(fmt.Sprintf("Error getting document: %s ", err))
+	}
+	b := result.Source
+	err = json.Unmarshal(b, &meta)
+	if err != nil {
+		log.Println("Unmarshal error ", err)
+	}
+	return meta, err
 }
 
-/**
- * @Description: 按照名称+版本作为索引返回一个元数据
- * @param name
- * @param versionId
- * @return meta
- * @return e
- */
-func getMetadata(name string, versionId int) (meta Metadata, e error) {
-	url := fmt.Sprintf("http://%s/metadata/objects/%s_%d/_source",
-		os.Getenv("ES_SERVER"), name, versionId)
-	r, e := http.Get(url)
-	if e != nil {
-		return
+func SearchLatestVersion(name string) (meta Metadata, err error) {
+	defer func() {
+		if err := recover(); err != nil {
+			// 获取 panic 的堆栈信息
+			var stackTrace string
+			for i := 1; ; i++ {
+				pc, file, line, ok := runtime.Caller(i)
+				if !ok {
+					break
+				}
+				stackTrace += fmt.Sprintf("%s:%d (0x%x)\n", file, line, pc)
+			}
+
+			// 获取 panic 的错误信息
+			errMsg := fmt.Sprintf("%v", err)
+
+			// 打印堆栈信息和错误信息
+			fmt.Printf("panic: %s\n%s", errMsg, stackTrace)
+		}
+	}()
+	searchService := client.Search()
+	searchSource := elastic.NewSearchSource()
+	searchSource.Query(elastic.NewMatchQuery("name", name))
+	searchSource.Sort("version", false) // 按照 version 字段降序排序
+	searchSource.Size(1)
+	searchResult, err := searchService.SearchSource(searchSource).Do(ctx)
+	if err != nil {
+		log.Println("SearchLatestVersion ", err)
 	}
-	if r.StatusCode != http.StatusOK {
-		e = fmt.Errorf("fail to get %s_%d: %d", name, versionId, r.StatusCode)
-		return
+	fmt.Println("searchResult.Hits = ", searchResult.Hits)
+	b := searchResult.Hits.Hits[0].Source
+	err = json.Unmarshal(b, &meta)
+	if err != nil {
+		log.Println("Unmarshal error ", err)
 	}
-	result, _ := io.ReadAll(r.Body)
-	json.Unmarshal(result, &meta)
 	return
 }
 
-func SearchLatestVersion(name string) (meta Metadata, e error) {
-	url := fmt.Sprintf("http://%s/metadata/_search?q=name:%s&size=1&sort=version:desc",
-		os.Getenv("ES_SERVER"), url2.PathEscape(name))
-	log.Println("url = ", url)
-	r, e := http.Get(url)
-	if e != nil {
-		return
-	}
-	if r.StatusCode != http.StatusOK {
-		e = fmt.Errorf("fail to search latest metadata: %d", r.StatusCode)
-		return
-	}
-	result, _ := io.ReadAll(r.Body)
-	var sr searchResult
-	json.Unmarshal(result, &sr)
-	if len(sr.Hits.Hits) != 0 {
-		meta = sr.Hits.Hits[0].Source
-	}
-
-	return
-}
-
-// GetMetadata
-/**
- * 对getMetadata的一层封装，增加了未指定版本时候自动获取最新的版本功能
- */
+// GetMetadata 对getMetadata的一层封装，增加了未指定版本时候自动获取最新的版本功能
 func GetMetadata(name string, version int) (Metadata, error) {
 	if version == 0 {
 		return SearchLatestVersion(name)
@@ -85,44 +106,26 @@ func GetMetadata(name string, version int) (Metadata, error) {
 	return getMetadata(name, version)
 }
 
-// PutMetadata
-/**
- * @Description: 把元数据存进去，信息包括名称，版本，size和哈希值
- * @param name
- * @param version
- * @param size
- * @param hash
- * @return error
- */
+// PutMetadata 把元数据存进去，信息包括名称，版本，size和哈希值
 func PutMetadata(name string, version int, size int64, hash string) error {
-	doc := fmt.Sprintf(`{"name":"%s","version":%d,"size":%d,"hash":"%s"}`,
-		name, version, size, hash)
-	client := http.Client{}
-	url := fmt.Sprintf("http://%s/metadata/objects/%s_%d?op_type=create",
-		os.Getenv("ES_SERVER"), name, version)
-	request, _ := http.NewRequest("PUT", url, strings.NewReader(doc))
-	r, e := client.Do(request)
-	if e != nil {
-		return e
+	index := fmt.Sprintf("%s_%d", name, version)
+	doc := map[string]interface{}{
+		"name":    name,
+		"version": version,
+		"size":    size,
+		"hash":    hash,
 	}
-	if r.StatusCode == http.StatusConflict {
-		return PutMetadata(name, version+1, size, hash)
+	_, err := client.Index().Index(index).Id("1").BodyJson(doc).Do(ctx)
+	if err != nil {
+		fmt.Println("Error indexing document: ", err)
+	} else {
+		fmt.Println("Document indexed:", doc)
 	}
-	if r.StatusCode != http.StatusCreated {
-		result, _ := io.ReadAll(r.Body)
-		return fmt.Errorf("fail to put metadata: %d %s", r.StatusCode, string(result))
-	}
-	return nil
+	log.Println("put success")
+	return err
 }
 
-// AddVersion
-/**
- * @Description: 版本迭代 version+1
- * @param name
- * @param hash
- * @param size
- * @return error
- */
+// AddVersion 版本迭代 version+1
 func AddVersion(name, hash string, size int64) error {
 	version, e := SearchLatestVersion(name)
 	if e != nil {
@@ -131,32 +134,23 @@ func AddVersion(name, hash string, size int64) error {
 	return PutMetadata(name, version.Version+1, size, hash)
 }
 
-// SearchAllVersions
-/**
- * @Description: 找出这个对象存在的所有版本
- * @param name
- * @param from
- * @param size
- * @return []Metadata
- * @return error
- */
-func SearchAllVersions(name string, from, size int) ([]Metadata, error) {
-	url := fmt.Sprintf("http://%s/metadata/_search?sort=name,version&from=%d&size=%d",
-		os.Getenv("ES_SERVER"), from, size)
-	if name != "" {
-		url += "&q=name:" + name
+// SearchAllVersions 找出这个对象存在的所有版本
+func SearchAllVersions(name string, from, size int) (metas []Metadata, err error) {
+	searchService := client.Search()
+	searchSource := elastic.NewSearchSource()
+	searchSource.Query(elastic.NewMatchQuery("name", name))
+	searchSource.Sort("version", false) // 按照 version 字段降序排序
+	searchSource.From(from)
+	searchSource.Size(size)
+	searchResult, err := searchService.SearchSource(searchSource).Do(ctx)
+	if err != nil {
+		log.Println("SearchLatestVersion ", err)
 	}
-	r, e := http.Get(url)
-	if e != nil {
-		return nil, e
+	fmt.Println("searchResult.Hits.Hits = ", searchResult.Hits.Hits)
+	metas = make([]Metadata, len(searchResult.Hits.Hits))
+	for i, hit := range searchResult.Hits.Hits {
+		b := hit.Source
+		_ = json.Unmarshal(b, &metas[i])
 	}
-	metas := make([]Metadata, 0)
-	result, _ := io.ReadAll(r.Body)
-	var sr searchResult
-	json.Unmarshal(result, &sr)
-	for i := range sr.Hits.Hits {
-		metas = append(metas, sr.Hits.Hits[i].Source)
-	}
-	log.Println(metas)
-	return metas, nil
+	return
 }
