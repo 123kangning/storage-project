@@ -35,6 +35,7 @@ func NewRSPutStream(dataServers []string, hash string, size int64) (*RSPutStream
 func (s *RSPutStream) Commit(success bool) {
 	s.Flush()
 	for i := range s.writers {
+		//成功时，向dataServer发送put请求，转正文件数据
 		s.writers[i].(*objectstream.TempPutStream).Commit(success)
 	}
 }

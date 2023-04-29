@@ -90,6 +90,10 @@ func SearchLatestVersion(name string) (meta Metadata, err error) {
 		log.Println("SearchLatestVersion ", err)
 	}
 	fmt.Println("searchResult.Hits = ", searchResult.Hits)
+	//没找到，也就是第一次查看时
+	if len(searchResult.Hits.Hits) == 0 {
+		return Metadata{}, nil
+	}
 	b := searchResult.Hits.Hits[0].Source
 	err = json.Unmarshal(b, &meta)
 	if err != nil {

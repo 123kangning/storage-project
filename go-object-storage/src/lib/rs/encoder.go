@@ -23,7 +23,7 @@ func NewEncoder(writers []io.Writer) *encoder {
 	return &encoder{writers, enc, nil}
 }
 
-//写入encoder.cache缓存，缓存写满之后flush，真正写入dataServer
+// 写入encoder.cache缓存，缓存写满之后flush，真正写入dataServer
 func (e *encoder) Write(p []byte) (n int, err error) {
 	// 获取待写入的数据 p 的总长度
 	length := len(p)
@@ -40,6 +40,7 @@ func (e *encoder) Write(p []byte) (n int, err error) {
 		// 新增缓存数据
 		e.cache = append(e.cache, p[current:current+next]...)
 		if len(e.cache) == BLOCK_SIZE {
+			//将缓存中的数据写入真正的数据切片,向dataServer发送patch请求
 			e.Flush()
 		}
 		// 当前已缓存数据长度增加
@@ -50,7 +51,7 @@ func (e *encoder) Write(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
-// Flush 将缓存中的数据写入真正的数据切片
+// Flush 将缓存中的数据写入真正的数据切片,向dataServer发送patch请求
 func (e *encoder) Flush() {
 	// 如果缓存数据长度为 0 则直接返回
 	if len(e.cache) == 0 {
@@ -74,7 +75,7 @@ func (e *encoder) Flush() {
 	*/
 	e.enc.Encode(shards)
 	for i := range shards {
-		// 每个数据分片文件真正写入分片数据
+		// 每个数据分片文件真正写入分片数据，发送patch请求
 		e.writers[i].Write(shards[i])
 	}
 	// 重置缓存大小
