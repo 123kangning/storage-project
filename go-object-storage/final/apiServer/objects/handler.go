@@ -14,10 +14,6 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		post(w, r)
 		return
 	}
-	if m == http.MethodPut {
-		put(w, r)
-		return
-	}
 	if m == http.MethodGet {
 		get(w, r)
 		return

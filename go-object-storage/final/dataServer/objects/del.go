@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// del 已弃用
 func del(w http.ResponseWriter, r *http.Request) {
 	hash := strings.Split(r.URL.EscapedPath(), "/")[2]
 	files, _ := filepath.Glob(os.Getenv("STORAGE_ROOT") + "/objects/" + hash + ".*")

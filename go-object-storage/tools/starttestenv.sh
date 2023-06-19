@@ -10,7 +10,4 @@ LISTEN_ADDRESS=10.29.1.4:12345 STORAGE_ROOT=/tmp/4/ go run ../final/dataServer/d
 LISTEN_ADDRESS=10.29.1.5:12345 STORAGE_ROOT=/tmp/5/ go run ../final/dataServer/dataServer.go &
 LISTEN_ADDRESS=10.29.1.6:12345 STORAGE_ROOT=/tmp/6/ go run ../final/dataServer/dataServer.go &
 
-LISTEN_ADDRESS=10.29.2.1:12345 go run ../final/apiServer/apiServer.go &
-LISTEN_ADDRESS=10.29.2.2:12345 go run ../final/apiServer/apiServer.go &
-
-WEB_SERVER_ADDRESS=10.29.3.1:12345 API_SERVER=10.29.2.1:12345 go run ../special/webServer/webServer.go
+LISTEN_ADDRESS=10.29.2.1:12345 go run ../final/apiServer

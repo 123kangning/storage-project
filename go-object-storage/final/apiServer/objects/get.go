@@ -3,6 +3,7 @@ package objects
 import (
 	"compress/gzip"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"io"
 	"log"
 	"net/http"
@@ -21,7 +22,7 @@ import (
  * @param w
  * @param r
  */
-func get(w http.ResponseWriter, r *http.Request) {
+func Put(c *gin.Context) {
 	name := strings.Split(r.URL.EscapedPath(), "/")[2]
 	versionId := r.URL.Query()["version"]
 	version := 0

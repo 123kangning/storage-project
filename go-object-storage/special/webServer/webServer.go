@@ -67,7 +67,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	h := sha256.New()                                  //生成hash对象
 	io.Copy(h, f)                                      //写入待上传文件内容至hash对象中
 	d := base64.StdEncoding.EncodeToString(h.Sum(nil)) //生成hash字符串
-	log.Println(d)
+	log.Println("hash = ", d)
 	f.Seek(0, 0)
 	dat, _ := io.ReadAll(f)
 	//构造上传文件的request请求

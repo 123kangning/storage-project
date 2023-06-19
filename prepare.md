@@ -5,7 +5,7 @@
 `docker network create somenetwork`
 
 安装elasticsearch
-`docker run -d --name elasticsearch --net somenetwork -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.6.2`
+`docker run -d --name elasticsearch --net somenetwork -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.12.1`
 
 安装es查询工具dejavu
 `docker run -p 1358:1358 -d --name dejavu appbaseio/dejavu`
@@ -14,7 +14,7 @@
 `docker run -d --name cerebro -p 9000:9000 lmenezes/cerebro`
 
 安装kibana查询工具
-`docker run -d --name kibana --net somenetwork -p 5601:5601 kibana:7.6.2`
+`docker run -d --name kibana --net somenetwork -p 5601:5601 kibana:7.12.1`
 ## 1.存储文件版本号时，es相对于mysql、redis的优势是什么
 
 1. 搜索性能：ES是面向文本搜索的NoSQL数据库，其全文搜索和分词能力更强大。因此，如果需要对文件版本号进行搜索和查询，ES会更适合。
