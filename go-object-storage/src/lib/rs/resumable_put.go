@@ -1,5 +1,6 @@
 package rs
 
+//该文件中内容已废除-暂不进行断点续传
 import (
 	"encoding/base64"
 	"encoding/json"
@@ -7,8 +8,8 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"project/go-object-storage/src/lib/objectstream"
-	"project/go-object-storage/src/lib/utils"
+	"storage/src/lib/objectstream"
+	"storage/src/lib/utils"
 )
 
 type resumableToken struct {

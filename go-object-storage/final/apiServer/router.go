@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"project/go-object-storage/final/apiServer/objects"
+	"storage/final/apiServer/objects"
 )
 
 func InitRouter() *gin.Engine {

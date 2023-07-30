@@ -1,8 +1,9 @@
 package rs
 
+//该文件中内容已废除-暂不进行断点续传
 import (
 	"io"
-	"project/go-object-storage/src/lib/objectstream"
+	"storage/src/lib/objectstream"
 )
 
 type RSResumableGetStream struct {

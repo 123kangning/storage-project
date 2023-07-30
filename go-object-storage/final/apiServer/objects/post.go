@@ -2,13 +2,13 @@ package objects
 
 import (
 	"log"
+	"myes"
 	"net/http"
 	"net/url"
-	"project/go-object-storage/final/apiServer/heartbeat"
-	"project/go-object-storage/final/apiServer/locate"
-	"project/go-object-storage/src/lib/es"
-	"project/go-object-storage/src/lib/rs"
-	"project/go-object-storage/src/lib/utils"
+	"storage/final/apiServer/heartbeat"
+	"storage/final/apiServer/locate"
+	"storage/src/lib/rs"
+	"storage/src/lib/utils"
 	"strconv"
 	"strings"
 )
@@ -28,7 +28,7 @@ func post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if locate.Exist(url.PathEscape(hash)) {
-		e = es.AddVersion(name, hash, size)
+		e = myes.AddVersion(name, hash, size)
 		if e != nil {
 			log.Println(e)
 			w.WriteHeader(http.StatusInternalServerError)

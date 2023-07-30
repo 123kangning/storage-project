@@ -13,8 +13,6 @@ import (
 	"project/go-object-storage/src/lib/es"
 	"project/go-object-storage/src/lib/rs"
 	"project/go-object-storage/src/lib/utils"
-	"strconv"
-	"strings"
 )
 
 /**
@@ -22,19 +20,8 @@ import (
  * @param w
  * @param r
  */
-func Put(c *gin.Context) {
-	name := strings.Split(r.URL.EscapedPath(), "/")[2]
-	versionId := r.URL.Query()["version"]
-	version := 0
-	var e error
-	if len(versionId) != 0 {
-		version, e = strconv.Atoi(versionId[0]) //拿到版本号
-		if e != nil {                           //有问题就报错
-			log.Println(e)
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-	}
+func Get(c *gin.Context) {
+	name := c.Query("name")
 	meta, e := es.GetMetadata(name, version) //	从ES中取出来
 	if e != nil {
 		log.Println(e)

@@ -5,9 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"project/go-object-storage/final/apiServer/heartbeat"
-	"project/go-object-storage/src/lib/es"
-	"project/go-object-storage/src/lib/rs"
+	"storage/final/apiServer/heartbeat"
+	"storage/src/lib/rs"
 )
 
 type BaseResp struct {
@@ -42,8 +41,8 @@ func Put(c *gin.Context) {
 		return
 	}
 
-	name := file.Filename                    //组成名字
-	e = es.AddVersion(name, hash, file.Size) //更新版本
+	name := file.Filename                      //组成名字
+	e = myes.AddVersion(name, hash, file.Size) //更新版本
 	if e != nil {
 		log.Println(e)
 		resp.Set(1, e.Error())

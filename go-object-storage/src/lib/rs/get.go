@@ -3,7 +3,7 @@ package rs
 import (
 	"fmt"
 	"io"
-	"project/go-object-storage/src/lib/objectstream"
+	"storage/src/lib/objectstream"
 )
 
 type RSGetStream struct {

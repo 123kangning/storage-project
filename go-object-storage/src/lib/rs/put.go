@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"project/go-object-storage/src/lib/objectstream"
+	"storage/src/lib/objectstream"
 )
 
 type RSPutStream struct {

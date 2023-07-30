@@ -5,8 +5,8 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"project/go-object-storage/final/apiServer/locate"
-	"project/go-object-storage/src/lib/utils"
+	"storage/final/apiServer/locate"
+	"storage/src/lib/utils"
 )
 
 func storeObject(r io.Reader, hash string, size int64) (int, error) {
