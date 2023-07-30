@@ -5,8 +5,8 @@ import (
 	"io"
 	"net/url"
 	"os"
-	"project/go-object-storage/final/dataServer/locate"
-	"project/go-object-storage/src/lib/utils"
+	"storage/final/dataServer/locate"
+	"storage/src/lib/utils"
 	"strconv"
 	"strings"
 )

@@ -4,10 +4,10 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"project/go-object-storage/final/dataServer/heartbeat"
-	"project/go-object-storage/final/dataServer/locate"
-	"project/go-object-storage/final/dataServer/objects"
-	"project/go-object-storage/final/dataServer/temp"
+	"storage/final/dataServer/heartbeat"
+	"storage/final/dataServer/locate"
+	"storage/final/dataServer/objects"
+	"storage/final/dataServer/temp"
 )
 
 func main() {

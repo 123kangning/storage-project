@@ -5,18 +5,19 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"storage/dao"
 	"storage/final/apiServer/heartbeat"
 	"storage/src/lib/rs"
 )
 
 type BaseResp struct {
-	statusCode    int
-	statusMessage string
+	StatusCode    int
+	StatusMessage string
 }
 
-func (r BaseResp) Set(code int, message string) {
-	r.statusCode = code
-	r.statusMessage = message
+func (r *BaseResp) Set(code int, message string) {
+	r.StatusCode = code
+	r.StatusMessage = message
 }
 func Put(c *gin.Context) {
 	log.Println("api.object.put")
@@ -41,13 +42,17 @@ func Put(c *gin.Context) {
 		return
 	}
 
-	name := file.Filename                      //组成名字
-	e = myes.AddVersion(name, hash, file.Size) //更新版本
+	name := file.Filename              //组成名字
+	e = dao.Add(name, hash, file.Size) //更新数据库
 	if e != nil {
 		log.Println(e)
 		resp.Set(1, e.Error())
-		c.JSON(http.StatusInternalServerError, resp)
+		c.JSON(http.StatusOK, resp)
+		return
 	}
+	resp.Set(0, "success")
+	log.Println("resp = ", resp)
+	c.JSON(http.StatusOK, resp)
 }
 
 // 调用dataServer生成文件，暂时还未写入，返回writer

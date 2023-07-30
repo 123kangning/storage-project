@@ -2,7 +2,7 @@ package objects
 
 import (
 	"log"
-	"myes"
+	//"myes"
 	"net/http"
 	"net/url"
 	"storage/final/apiServer/heartbeat"
@@ -28,7 +28,7 @@ func post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if locate.Exist(url.PathEscape(hash)) {
-		e = myes.AddVersion(name, hash, size)
+		//e = myes.AddVersion(name, hash, size)
 		if e != nil {
 			log.Println(e)
 			w.WriteHeader(http.StatusInternalServerError)

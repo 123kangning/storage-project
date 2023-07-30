@@ -3,9 +3,9 @@ package locate
 import (
 	"encoding/json"
 	"os"
-	"project/go-object-storage/src/lib/rabbitmq"
-	"project/go-object-storage/src/lib/rs"
-	"project/go-object-storage/src/lib/types"
+	"storage/src/lib/rabbitmq"
+	"storage/src/lib/rs"
+	"storage/src/lib/types"
 	"time"
 )
 

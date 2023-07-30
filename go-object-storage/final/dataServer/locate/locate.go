@@ -3,8 +3,8 @@ package locate
 import (
 	"os"
 	"path/filepath"
-	"project/go-object-storage/src/lib/rabbitmq"
-	"project/go-object-storage/src/lib/types"
+	"storage/src/lib/rabbitmq"
+	"storage/src/lib/types"
 	"strconv"
 	"strings"
 	"sync"

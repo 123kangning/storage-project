@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"project/go-object-storage/final/dataServer/locate"
+	"storage/final/dataServer/locate"
 	"strings"
 )
 

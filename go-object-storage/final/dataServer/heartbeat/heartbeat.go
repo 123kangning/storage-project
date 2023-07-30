@@ -2,7 +2,7 @@ package heartbeat
 
 import (
 	"os"
-	"project/go-object-storage/src/lib/rabbitmq"
+	"storage/src/lib/rabbitmq"
 	"time"
 )
 
