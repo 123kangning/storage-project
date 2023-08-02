@@ -1,23 +1,46 @@
 package main
 
 import (
-	"log"
+	"compress/gzip"
+	"fmt"
+	"io"
 	"os"
 )
 
 func main() {
-	file, err := os.Open("/home/kangning/speak.txt")
-	if err != nil {
-		log.Println("open error , ", err)
-		return
-	}
-
-	for i := 0; i < 10; i++ {
-		buf := make([]byte, 1563)
-		file.Read(buf)
-		log.Println("file = ", string(buf))
-		//info, _ := file.Stat()
-		//log.Println("file = ", info)
-		//log.Println("hash = ", utils.CalculateHash(file))
-	}
+	zip()
+	ziP()
+	//unzip()
+	//unZiP()
+}
+func unZiP() {
+	zip, _ := os.Open("/home/kangning/go-project/speak.unzip")
+	buf := make([]byte, 10000)
+	zip.Read(buf)
+	fmt.Println("unzip = ", string(buf))
+	zip.Close()
+}
+func unzip() {
+	zip, _ := os.Open("/home/kangning/go-project/speak.zip")
+	unzip, _ := os.Create("/home/kangning/go-project/speak.unzip")
+	r, _ := gzip.NewReader(zip)
+	io.Copy(unzip, r)
+	unzip.Close()
+	zip.Close()
+}
+func ziP() {
+	zip, _ := os.Open("/home/kangning/go-project/speak.zip")
+	buf := make([]byte, 10000)
+	zip.Read(buf)
+	fmt.Println("zip = ", string(buf))
+	zip.Close()
+}
+func zip() {
+	file, _ := os.Open("/home/kangning/go-project/speak.txt")
+	zip, _ := os.Create("/home/kangning/go-project/speak.zip")
+	w := gzip.NewWriter(zip)
+	io.Copy(w, file)
+	w.Close()
+	zip.Close()
+	file.Close()
 }

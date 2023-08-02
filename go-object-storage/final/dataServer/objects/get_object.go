@@ -2,7 +2,7 @@ package objects
 
 import (
 	"crypto/sha256"
-	"encoding/base64"
+	"encoding/hex"
 	"log"
 	"net/url"
 	"os"
@@ -21,7 +21,7 @@ func getFile(name string) string {
 	// 计算哈希值并进行 url 转义
 	h := sha256.New()
 	SendFile(h, file)
-	d := url.PathEscape(base64.StdEncoding.EncodeToString(h.Sum(nil)))
+	d := url.PathEscape(hex.EncodeToString(h.Sum(nil)))
 	hash := strings.Split(file, ".")[2]
 	// 如果磁盘文件计算的哈希值与请求的哈希值不一致，说明磁盘的文件数据被降解，需要删除该错误的数据
 	if d != hash {

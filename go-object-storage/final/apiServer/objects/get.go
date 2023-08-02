@@ -2,57 +2,90 @@ package objects
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
+	"io"
+	"log"
+	"net/http"
+	"net/url"
+	"os"
+	"storage/dao"
 	"storage/final/apiServer/heartbeat"
 	"storage/final/apiServer/locate"
 	"storage/src/lib/rs"
+	"time"
 )
 
-//Get @Description:	取出对象，注意按照版本取，URL里没指定就取最新的版本
-//
-//func Get(c *gin.Context) {
-//	name := c.Query("name")
-//	meta, e := es.GetMetadata(name, version) //	从ES中取出来
-//	if e != nil {
-//		log.Println(e)
-//		w.WriteHeader(http.StatusInternalServerError)
-//		return
-//	}
-//	if meta.Hash == "" { //空的就是没找到咯，del里面删除不就是置空吗
-//		w.WriteHeader(http.StatusNotFound)
-//		return
-//	}
-//	hash := url.PathEscape(meta.Hash) //对字符串转义，保证传输过程中的安全
-//	stream, e := GetStream(hash, meta.Size)
-//	if e != nil {
-//		log.Println(e)
-//		w.WriteHeader(http.StatusNotFound)
-//		return
-//	}
-//	offset := utils.GetOffsetFromHeader(r.Header)
-//	if offset != 0 {
-//		stream.Seek(offset, io.SeekCurrent)
-//		w.Header().Set("content-range", fmt.Sprintf("bytes %d-%d/%d", offset, meta.Size-1, meta.Size))
-//		w.WriteHeader(http.StatusPartialContent)
-//	}
-//	//可选 gzip进行压缩
-//	acceptGzip := false
-//	encoding := r.Header["Accept-Encoding"]
-//	for i := range encoding {
-//		if encoding[i] == "gzip" {
-//			acceptGzip = true
-//			break
-//		}
-//	}
-//	if acceptGzip {
-//		w.Header().Set("content-encoding", "gzip")
-//		w2 := gzip.NewWriter(w)
-//		io.Copy(w2, stream)
-//		w2.Close()
-//	} else {
-//		io.Copy(w, stream)
-//	}
-//	stream.Close()
-//}
+func streamToFile(stream io.Reader) (*os.File, error) {
+	tempFile, err := os.CreateTemp("", "t1")
+	if err != nil {
+		log.Println("1 err = ", err)
+		return nil, err
+	}
+
+	_, err = tempFile.ReadFrom(stream)
+	if err != nil {
+		log.Println("2 err = ", err)
+		tempFile.Close()
+		return nil, err
+	}
+
+	tempFile.Close()
+	return tempFile, nil
+}
+
+// Get 取出对象，按照name取
+func Get(c *gin.Context) {
+	name := c.Query("name")
+	file := dao.Get(name) //	从ES中取出来
+	resp := &BaseResp{}
+	if file.Hash == "" { //空的就是没找到咯，del里面删除不就是置空吗
+		resp.Set(1, "未找到该文件")
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+	hash := url.PathEscape(file.Hash) //对字符串转义，保证传输过程中的安全
+	stream, e := GetStream(hash, file.Size)
+	if e != nil {
+		log.Println(e)
+		resp.Set(1, e.Error())
+		c.JSON(http.StatusNotFound, resp)
+		return
+	}
+	//可选 gzip进行压缩
+	//acceptGzip := false
+	//encoding := c.GetHeader("Accept-Encoding")
+	//if encoding == "gzip" {
+	//	acceptGzip = true
+	//}
+	//if acceptGzip {
+	//	c.Header("content-encoding", "gzip")
+	//	//w.Header().Set("content-encoding", "gzip")
+	//	w2 := gzip.NewWriter(w)
+	//	io.Copy(w2, stream)
+	//	w2.Close()
+	//} else {
+	//	io.Copy(c.w, stream)
+	//}
+	//buf := make([]byte, 10000)
+	//stream.Read(buf)
+	//log.Println("stream = ", string(buf))
+	//resp.file, e = streamToFile(stream)
+	f, e := os.CreateTemp("", name+time.Now().Format("2006-01-02 15:04:05"))
+	defer os.Remove(f.Name())
+	io.Copy(f, stream)
+	if e != nil {
+		resp.Set(1, e.Error())
+		c.JSON(http.StatusOK, resp)
+	} else {
+		c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s", name))
+		//fmt.Sprintf("attachment; filename=%s", filename)对下载的文件重命名
+		c.Writer.Header().Add("Content-Type", "application/octet-stream")
+		resp.Set(0, "success")
+		c.File(f.Name())
+	}
+	//c.JSON(http.StatusOK, resp)
+	stream.Close()
+}
 
 func GetStream(hash string, size int64) (*rs.RSGetStream, error) {
 	locateInfo := locate.Locate(hash)

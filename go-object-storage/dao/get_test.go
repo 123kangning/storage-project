@@ -6,9 +6,9 @@ import (
 )
 
 func TestGet(t *testing.T) {
-	ans := Get("speak.txt")
+	ans := Get("十号文档.txt")
 	log.Println(ans)
-	if len(ans) != 2 {
+	if ans.Name != "十号文档.txt" {
 		t.Error("Get error")
 	}
 }
