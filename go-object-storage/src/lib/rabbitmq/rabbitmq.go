@@ -1,6 +1,7 @@
 package rabbitmq
 
 import (
+	"context"
 	"encoding/json"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
@@ -60,7 +61,7 @@ func (q *RabbitMQ) Send(queue string, body interface{}) {
 	if e != nil {
 		panic(e)
 	}
-	e = q.channel.Publish("",
+	e = q.channel.PublishWithContext(context.Background(), "",
 		queue,
 		false,
 		false,
@@ -78,7 +79,7 @@ func (q *RabbitMQ) Publish(exchange string, body interface{}) {
 	if e != nil {
 		panic(e)
 	}
-	e = q.channel.Publish(exchange,
+	e = q.channel.PublishWithContext(context.Background(), exchange,
 		"",
 		false,
 		false,
