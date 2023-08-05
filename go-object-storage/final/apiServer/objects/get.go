@@ -11,29 +11,34 @@ import (
 	"storage/dao"
 	"storage/final/apiServer/heartbeat"
 	"storage/final/apiServer/locate"
+	"storage/myes"
 	"storage/src/lib/rs"
 	"time"
 )
 
-func streamToFile(stream io.Reader) (*os.File, error) {
-	tempFile, err := os.CreateTemp("", "t1")
-	if err != nil {
-		log.Println("1 err = ", err)
-		return nil, err
-	}
-
-	_, err = tempFile.ReadFrom(stream)
-	if err != nil {
-		log.Println("2 err = ", err)
-		tempFile.Close()
-		return nil, err
-	}
-
-	tempFile.Close()
-	return tempFile, nil
+type SearchResponse struct {
+	BaseResp BaseResp
+	Files    []string `json:"Files"`
 }
 
-// Get 取出对象，按照name取
+// Search es查询
+func Search(c *gin.Context) {
+	name := c.Query("name")
+	resp := SearchResponse{}
+	files, err := myes.GetFile(name)
+	if err != nil {
+		resp.BaseResp.Set(1, err.Error())
+		log.Println("err = ", err)
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+	for _, file := range files {
+		resp.Files = append(resp.Files, file.Name)
+	}
+	c.JSON(http.StatusOK, resp)
+}
+
+// Get 精确取出对象，按照name取
 func Get(c *gin.Context) {
 	name := c.Query("name")
 	file := dao.Get(name) //	从ES中取出来

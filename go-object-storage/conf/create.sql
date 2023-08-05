@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `file` (
-    `id` INTEGER NOT NULL auto_increment,
+    `id` BIGINT NOT NULL auto_increment,
     `name` VARCHAR(255) NOT NULL,
     `size` INTEGER NOT NULL,
     `hash` CHAR(64) NOT NULL,
