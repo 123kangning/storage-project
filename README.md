@@ -1,47 +1,22 @@
 # go 分布式存储项目
 
-在项目中构建ApiServer和DataServer两个模块。ApiServer负责处理用户请求。
-DataServer负责执行真正意义上的数据读写。ApiServer通过消息队列收集所有可用的DataServer节点地址，
-实现了两个模块之间的解耦。引入Elasticsearch存储文件元数据信息以及hash值，
-使得在进行大数据量处理时仍然具有较高的搜索性能。
-
-Flink SQL:
-```html
-CREATE TABLE file (
-    `id` INTEGER NOT NULL ,
-     `name` VARCHAR(255) NOT NULL,
-     `size` INTEGER NOT NULL,
-     `hash` CHAR(64) NOT NULL,
-     `is_delete` BOOLEAN NOT NULL,
-     `update_at` TIMESTAMP_LTZ NOT NULL,
-     PRIMARY KEY (`id`) NOT ENFORCED
-) WITH (
-   'connector' = 'mysql-cdc',
-    'hostname' = 'localhost',
-    'port' = '3306',
-    'username' = 'file',
-    'password' = 'file',
-    'database-name' = 'file',
-    'table-name' = 'file',
-    'format' = 'UTF-8'
-);
-
-CREATE TABLE esfile (
-   id INT NOT NULL,
-   name STRING NOT NULL,
-   size INT NOT NULL,
-   hash STRING NOT NULL,
-   is_delete BOOLEAN NOT NULL,
-   PRIMARY KEY (id) NOT ENFORCED
-) WITH (
-   'connector' = 'elasticsearch-7',
-   'hosts' = 'http://localhost:9200',
-   'index' = 'esfile',
-   'document-type' = '_doc',
-   'format' = 'json',
-   'sink.bulk-flush.interval' = '1000',
-   'sink.bulk-flush.max-size' = '5mb',
-   'format'='UTF-8'
-);
-```
-
+## 项目简介
+- `go-object-storage`目录下存放所有源代码
+- `conf`目录下存放配置信息以及数据库初始化文件
+	- `my.cnf` 配置运行canal所需配置
+	- `init.sql` 创建file用户和canal用户，file用户用于业务上的操作数据库，canal用户用于canal同步数据订阅binlog时使用
+- `dao`目录下存放数据库操作代码
+- `final`目录下构建ApiServer和DataServer两个模块。ApiServer负责处理用户请求。DataServer负责执行真正意义上的数据读写。ApiServer通过消息队列收集所有可用DataServer节点地址，实现了两个模块之间的解耦。
+- `myes`目录下存放操作es以及canal同步数据的代码
+- `src`目录下多种操作整合的代码
+	- `objectstream`用于将文件对象转化为stream流`向dataServer中存储或者从dataServer中获取`
+	- `rabbitmq`放置消息队列相关操作：
+		- apiServer获取活跃dataServer的数量以及它们的信息(监听dataServer心跳)
+		- apiServer中通过文件hash获得存放文件分片的节点地址
+	- `rs`存放调用rs纠删库实现文件分片存储的代码，还包括了获取文件流和生成到存储节点的文件流的代码。这部分会在底层调用`objectstream`中的代码，通过http将apiServer和dataServer连接起来
+- `tools`目录下存放初始化环境、清理测试环境和启动存储节点等操作的快捷脚本
+## 项目运行
+1. 进入myes目录，执行`docker-compose up -d`启动es相关环境
+2. 根据conf目录下的配置(init.sql和my.cnf)，初始化数据库配置
+3. 运行tools目录下的inittestenv.sh和starttestenv.sh脚本，设置网络环境并启动存储节点
+4. 进入`final/apiServer/`目录，执行`go run .`启动apiServer,默认在本机的`10.29.2.1:12345`地址上运行
