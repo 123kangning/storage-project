@@ -117,7 +117,7 @@ func Run() {
 	}
 	// Register a handler to handler Events
 	c.SetEventHandler(&BinlogSync{})
-
+	<-Start
 	err = c.Run()
 	if err != nil {
 		log.Fatal(err)

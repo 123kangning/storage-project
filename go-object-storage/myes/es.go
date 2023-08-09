@@ -17,11 +17,11 @@ type EsFile struct {
 }
 
 var (
+	Start     = make(chan struct{})
 	client    *elastic.Client
 	url       = "http://localhost:9200"
 	ctx       = context.Background()
 	fileIndex = "file"
-	quit      = make(chan struct{})
 	mapping   = `{
 	  "mappings": {
 		"properties": {
@@ -54,7 +54,7 @@ func Init() {
 	log.Println(elastic.Version)
 	log.Println(client)
 	creatIndex()
-	<-quit
+	Start <- struct{}{}
 }
 
 func creatIndex() {
