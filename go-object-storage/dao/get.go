@@ -32,7 +32,7 @@ func Get(name string) File {
 // GetAll 获取全部文件
 func GetAll() []File {
 	// 准备预编译语句
-	stmt, err := DB.Prepare("select name,size,hash,update_at from file order by 'update_at' desc limit 10")
+	stmt, err := DB.Prepare("select name,size,hash,update_at from file where is_delete=0 order by 'update_at' desc limit 10")
 	if err != nil {
 		log.Fatal(err)
 	}
