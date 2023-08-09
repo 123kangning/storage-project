@@ -102,8 +102,8 @@ func updateFunc(ev *canal.RowsEvent) {
 func Run() {
 	cfg := canal.NewDefaultConfig()
 	//cfg.Addr = "127.0.0.1:3306"
-	cfg.User = "file"
-	cfg.Password = "file"
+	cfg.User = "canal"
+	cfg.Password = "canal"
 	// 数据库名
 	cfg.Dump.TableDB = "file"
 	cfg.ServerID = 1
