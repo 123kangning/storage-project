@@ -1,0 +1,341 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "storage",
+    "description": "",
+    "version": "1.0.0"
+  },
+  "tags": [],
+  "paths": {
+    "/file/put": {
+      "put": {
+        "summary": "上传",
+        "x-apifox-folder": "",
+        "x-apifox-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "hash",
+            "in": "header",
+            "description": "sha256",
+            "required": false,
+            "example": "1a799eb03e1849401d29da3a7062b73da10727c2de26019b5d0053c59e42f797",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "example": "file:///home/kangning/speak.txt",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "StatusCode": {
+                      "type": "integer"
+                    },
+                    "StatusMessage": {
+                      "type": "string"
+                    }
+                  },
+                  "x-apifox-orders": [
+                    "StatusCode",
+                    "StatusMessage"
+                  ],
+                  "required": [
+                    "StatusCode",
+                    "StatusMessage"
+                  ],
+                  "x-apifox-ignore-properties": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/2623267/apis/api-76728620-run"
+      }
+    },
+    "/file/get": {
+      "get": {
+        "summary": "下载",
+        "x-apifox-folder": "",
+        "x-apifox-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "speak.txt",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "StatusCode": {
+                      "type": "integer"
+                    },
+                    "StatusMessage": {
+                      "type": "string"
+                    }
+                  },
+                  "x-apifox-orders": [
+                    "StatusCode",
+                    "StatusMessage"
+                  ],
+                  "required": [
+                    "StatusCode",
+                    "StatusMessage"
+                  ],
+                  "x-apifox-ignore-properties": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/2623267/apis/api-76730527-run"
+      }
+    },
+    "/file/": {
+      "get": {
+        "summary": "主页",
+        "x-apifox-folder": "",
+        "x-apifox-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/2623267/apis/api-77685110-run"
+      }
+    },
+    "/file/del": {
+      "delete": {
+        "summary": "删除",
+        "x-apifox-folder": "",
+        "x-apifox-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "speak.txt",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "StatusCode": {
+                      "type": "integer"
+                    },
+                    "StatusMessage": {
+                      "type": "string"
+                    }
+                  },
+                  "x-apifox-orders": [
+                    "StatusCode",
+                    "StatusMessage"
+                  ],
+                  "required": [
+                    "StatusCode",
+                    "StatusMessage"
+                  ],
+                  "x-apifox-ignore-properties": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/2623267/apis/api-99819514-run"
+      }
+    },
+    "/file/search": {
+      "get": {
+        "summary": "查找",
+        "x-apifox-folder": "",
+        "x-apifox-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "speak.txt",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "BaseResp": {
+                      "$ref": "#/components/schemas/BaseResp"
+                    },
+                    "Files": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "x-apifox-orders": [
+                    "BaseResp",
+                    "Files"
+                  ],
+                  "required": [
+                    "Files",
+                    "BaseResp"
+                  ],
+                  "x-apifox-ignore-properties": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/2623267/apis/api-100783822-run"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "File": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "hash": {
+            "type": "string"
+          },
+          "updateAt": {
+            "type": "string"
+          },
+          "isDelete": {
+            "type": "integer",
+            "description": "删除之后该字段为1"
+          }
+        },
+        "x-apifox-orders": [
+          "name",
+          "size",
+          "hash",
+          "updateAt",
+          "isDelete"
+        ],
+        "required": [
+          "name",
+          "size",
+          "hash",
+          "updateAt",
+          "isDelete"
+        ],
+        "x-apifox-ignore-properties": [],
+        "x-apifox-folder": ""
+      },
+      "BaseResp": {
+        "type": "object",
+        "properties": {
+          "StatusCode": {
+            "type": "integer"
+          },
+          "statusMessage": {
+            "type": "string"
+          }
+        },
+        "x-apifox-orders": [
+          "StatusCode",
+          "statusMessage"
+        ],
+        "required": [
+          "StatusCode",
+          "statusMessage"
+        ],
+        "x-apifox-ignore-properties": [],
+        "x-apifox-folder": ""
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://prod-cn.your-api-server.com",
+      "description": "正式环境"
+    },
+    {
+      "url": "http://10.29.2.1:12345",
+      "description": "开发环境"
+    },
+    {
+      "url": "http://test-cn.your-api-server.com",
+      "description": "测试环境"
+    }
+  ]
+}
