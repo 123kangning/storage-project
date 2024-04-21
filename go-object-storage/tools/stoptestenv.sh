@@ -1,6 +1,6 @@
 #!/bin/bash
 
-apiServer_pid=$(pgrep -f "apiServer")
+web_pid=$(pgrep -f "web")
 if [[ -n "$apiServer_pid" ]]; then
     echo "Stopping apiServer ..."
     kill $apiServer_pid
