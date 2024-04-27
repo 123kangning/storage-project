@@ -2,7 +2,7 @@ package locate
 
 import (
 	"encoding/json"
-	"os"
+	"storage/conf"
 	"storage/internal/pkg/rabbitmq"
 	"storage/internal/pkg/rs"
 	"storage/internal/pkg/types"
@@ -17,7 +17,7 @@ import (
   - @return locateInfo	对象所在的地址,Id与Addr的键值对
 */
 func Locate(name string) (locateInfo map[int]string) {
-	q := rabbitmq.New(os.Getenv("RABBITMQ_SERVER"))
+	q := rabbitmq.New(conf.RABBITMQ_SERVER)
 	q.Publish("dataServers", name)
 	c := q.Consume()
 	go func() {

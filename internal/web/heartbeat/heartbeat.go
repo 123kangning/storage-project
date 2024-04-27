@@ -1,7 +1,7 @@
 package heartbeat
 
 import (
-	"os"
+	"storage/conf"
 	"storage/internal/pkg/rabbitmq"
 	"strconv"
 	"sync"
@@ -18,7 +18,7 @@ var mutex sync.RWMutex                       //处理并发的锁
 *		心跳信号是有内容的，包括发自于哪个节点的地址和发送的时间，要把发送心跳信号的时间更新到dataServers
 */
 func ListenHeartbeat() {
-	q := rabbitmq.New(os.Getenv("RABBITMQ_SERVER"))
+	q := rabbitmq.New(conf.RABBITMQ_SERVER)
 	defer q.Close()
 	q.Bind("apiServers")
 	c := q.Consume()

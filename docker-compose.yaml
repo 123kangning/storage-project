@@ -1,12 +1,40 @@
 version: '3'
 services:
+  mysql:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: my_root
+      MYSQL_DATABASE: file
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+      - ./conf/init.sql:/docker-entrypoint-initdb.d/init.sql
+  rabbitmq:
+    image: rabbitmq:3.12.6-management
+    container_name: rabbitmq_3_12
+    restart: always
+  # 节点名 rabbit@rabbitserver，不然会去容器ID
+    hostname: rabbit_server
+    environment:
+        # 默认虚拟机名
+      RABBITMQ_DEFAULT_VHOST: vhost-1
+        # 用户名
+      RABBITMQ_DEFAULT_USER: root
+        # 密码
+      RABBITMQ_DEFAULT_PASS: my_root
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ./data/rabbitmq:/var/lib/rabbitmq
   elasticsearch:
     image: elasticsearch:7.12.1
     container_name: myes
     environment:
       discovery.type: single-node
+      plugins.analysis-ik: true
     volumes:
-      - ./plugins:/usr/share/elasticsearch/plugins
+      - ./myes/plugins:/usr/share/elasticsearch/plugins
     ports:
       - "9200:9200" #暴露给用户
       - "9300:9300" #组件之间互联
@@ -16,7 +44,7 @@ services:
     image: kibana:7.12.1
     container_name: kibana
     environment:
-      - ELASTICSEARCH_HOSTS=http://myes:9200
+      - ELASTICSEARCH_HOSTS=http://localhost:9200
     ports:
       - "5601:5601"
     networks:

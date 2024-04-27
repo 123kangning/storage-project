@@ -3,6 +3,7 @@ package locate
 import (
 	"os"
 	"path/filepath"
+	"storage/conf"
 	"storage/internal/pkg/rabbitmq"
 	"storage/internal/pkg/types"
 	"strconv"
@@ -41,7 +42,7 @@ func Del(hash string) {
 
 // StartLocate 从消息队列中获取msg 查找资源是否存在
 func StartLocate() {
-	q := rabbitmq.New(os.Getenv("RABBITMQ_SERVER"))
+	q := rabbitmq.New(conf.RABBITMQ_SERVER)
 	defer q.Close()
 	q.Bind("dataServers")
 	c := q.Consume()
