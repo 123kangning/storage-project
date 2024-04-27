@@ -5,7 +5,7 @@ import (
 	"github.com/go-mysql-org/go-mysql/canal"
 	"github.com/go-mysql-org/go-mysql/mysql"
 	"github.com/go-mysql-org/go-mysql/replication"
-	"log"
+	"storage/conf"
 )
 
 type BinlogSync struct {
@@ -100,26 +100,29 @@ func updateFunc(ev *canal.RowsEvent) {
 	}
 }
 func Run() {
-	cfg := canal.NewDefaultConfig()
-	//cfg.Addr = "127.0.0.1:3306"
-	cfg.User = "canal"
-	cfg.Password = "canal"
-	// 数据库名
-	cfg.Dump.TableDB = "file"
-	cfg.ServerID = 1
+	cfg := &canal.Config{
+		Addr:     conf.MysqlAddr,
+		User:     "canal",
+		Password: "canal",
+		Charset:  "utf8mb4",
+		ServerID: conf.ServerID,
+		Dump: canal.DumpConfig{
+			TableDB: "file",
+		},
+	}
 	// 表名
-	cfg.Dump.Tables = []string{"file.file"}
-	cfg.Dump.ExecutionPath = ""
+	//cfg.Dump.Tables = []string{"file.file"}
+	//cfg.Dump.ExecutionPath = ""
 
 	c, err := canal.NewCanal(cfg)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	// Register a handler to handler Events
 	c.SetEventHandler(&BinlogSync{})
 	<-Start
 	err = c.Run()
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 }
