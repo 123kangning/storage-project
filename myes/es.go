@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/olivere/elastic/v7"
-	"log"
+	"github.com/siddontang/go-log/log"
 	"reflect"
 	"strconv"
 )
@@ -45,14 +45,13 @@ var (
 func Init() {
 	var err error
 	client, err = elastic.NewClient(
-		elastic.SetURL(url),
 		elastic.SetSniff(false),
+		elastic.SetURL(url),
 	)
 	if err != nil {
-		log.Println("连接es失败", err)
+		log.Error("连接es失败", err)
+		panic(err)
 	}
-	log.Println(elastic.Version)
-	log.Println(client)
 	creatIndex()
 	Start <- struct{}{}
 }

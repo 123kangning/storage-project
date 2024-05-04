@@ -4,35 +4,22 @@ services:
     image: mysql:5.7
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: my_root
-      MYSQL_DATABASE: file
+      - MYSQL_ROOT_PASSWORD=my_root
+      - MYSQL_DATABASE=file
+      - MYSQL_USER=file
+      - MYSQL_PASSWORD=file
+      - MYSQL_USER2=canal
+      - MYSQL_PASSWORD2=canal
+    ports:
+      - "3316:3306"
     volumes:
       - ./data/mysql:/var/lib/mysql
       - ./conf/init.sql:/docker-entrypoint-initdb.d/init.sql
-  rabbitmq:
-    image: rabbitmq:3.12.6-management
-    container_name: rabbitmq_3_12
-    restart: always
-  # 节点名 rabbit@rabbitserver，不然会去容器ID
-    hostname: rabbit_server
-    environment:
-        # 默认虚拟机名
-      RABBITMQ_DEFAULT_VHOST: vhost-1
-        # 用户名
-      RABBITMQ_DEFAULT_USER: root
-        # 密码
-      RABBITMQ_DEFAULT_PASS: my_root
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    volumes:
-      - ./data/rabbitmq:/var/lib/rabbitmq
+      - ./conf/my.cnf:/etc/my.cnf
   elasticsearch:
     image: elasticsearch:7.12.1
-    container_name: myes
     environment:
       discovery.type: single-node
-      plugins.analysis-ik: true
     volumes:
       - ./myes/plugins:/usr/share/elasticsearch/plugins
     ports:
@@ -42,11 +29,12 @@ services:
       - esNet
   kibana:
     image: kibana:7.12.1
-    container_name: kibana
     environment:
-      - ELASTICSEARCH_HOSTS=http://localhost:9200
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     ports:
       - "5601:5601"
+    depends_on:
+      - elasticsearch
     networks:
       - esNet
 networks:

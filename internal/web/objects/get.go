@@ -40,10 +40,15 @@ func Search(c *gin.Context) {
 
 // Get 精确取出对象，按照name取
 func Get(c *gin.Context) {
-	name := c.Query("name")
-	file := dal.Get(name) //	从ES中取出来
 	resp := &BaseResp{}
-	if file.Hash == "" { //空的就是没找到咯，del里面删除不就是置空吗
+	name, err := url.QueryUnescape(c.Query("name"))
+	if err != nil {
+		resp.Set(1, "文件名称解析出错")
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+	file := dal.Get(name) //	从ES中取出来
+	if file.Hash == "" {  //空的就是没找到咯，del里面删除不就是置空吗
 		resp.Set(1, "未找到该文件")
 		c.JSON(http.StatusOK, resp)
 		return

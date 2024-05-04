@@ -8,7 +8,7 @@ import (
 )
 
 func StartHeartbeat() {
-	q := rabbitmq.New(conf.RABBITMQ_SERVER)
+	q := rabbitmq.New(conf.RabbitmqServer)
 	defer q.Close()
 	for {
 		q.Publish("apiServers", os.Getenv("LISTEN_ADDRESS"))

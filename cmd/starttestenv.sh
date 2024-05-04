@@ -1,6 +1,5 @@
 #!/bin/bash
 
-export RABBITMQ_SERVER="amqp://root:my_root@localhost:5672/vhost-1"
 export ES_SERVER=127.0.0.1:9200
 
 LISTEN_ADDRESS=10.29.1.1:12345 STORAGE_ROOT=/tmp/1/ go run ../internal/dataServer/dataServer.go &

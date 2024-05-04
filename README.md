@@ -16,10 +16,11 @@
 	- `rs`存放调用rs纠删库实现文件分片存储的代码，还包括了获取文件流和生成到存储节点的文件流的代码。这部分会在底层调用`objectstream`中的代码，通过http将apiServer和dataServer连接起来
 - `tools`目录下存放初始化环境、清理测试环境和启动存储节点等操作的快捷脚本
 ## 项目运行
-1. 进入`myes`目录，执行`docker-compose up -d`启动es相关环境
-2. 根据`conf`目录下的配置(init.sql和my.cnf)，初始化数据库配置
-3. 运行`tools`目录下的`inittestenv.sh`和`starttestenv.sh`脚本，设置网络环境并启动存储节点
-4. 进入`final/apiServer/`目录，执行`go run .`启动apiServer,默认在本机的`10.29.2.1:12345`地址上运行
+1. 执行`docker-compose up -d`启动es相关环境
+2. ~~根据`conf`目录下的配置(init.sql和my.cnf)，初始化数据库配置~~，初始化合入到第1步
+3. rabbitmq在运行之前需要手动去控制面板创建`apiServers`和`dataServers`这两个exchange
+4. 运行`tools`目录下的`inittestenv.sh`和`starttestenv.sh`脚本，设置网络环境并启动存储节点
+5. 进入`internal/web/`目录，执行`go run .`启动apiServer,默认在本机的`10.29.2.1:12345`地址上运行
 ## 接口文档
 - 主目录下`storage.openapi.json`文件
 - 使用方法：通过`Apifox`等工具将该文件导入，导入时选择`OpenAPI/Swagger`数据格式，构建出项目的`API`文档

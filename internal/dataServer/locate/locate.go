@@ -42,7 +42,7 @@ func Del(hash string) {
 
 // StartLocate 从消息队列中获取msg 查找资源是否存在
 func StartLocate() {
-	q := rabbitmq.New(conf.RABBITMQ_SERVER)
+	q := rabbitmq.New(conf.RabbitmqServer)
 	defer q.Close()
 	q.Bind("dataServers")
 	c := q.Consume()
