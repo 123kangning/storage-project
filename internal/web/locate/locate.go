@@ -18,7 +18,7 @@ import (
 */
 func Locate(name string) (locateInfo map[int]string) {
 	q := rabbitmq.New(conf.RabbitmqServer)
-	q.Publish("dataServers", name)
+	q.Publish("dataServer", name)
 	c := q.Consume()
 	go func() {
 		time.Sleep(time.Second)

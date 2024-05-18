@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"log"
+	"storage/conf"
 )
 
 type RabbitMQ struct {
@@ -11,6 +13,28 @@ type RabbitMQ struct {
 	conn     *amqp.Connection
 	Name     string
 	exchange string
+}
+
+func init() {
+	mq := New(conf.RabbitmqServer)
+	//交换机都为扇出，用着简单，直接广播就行
+	exchanges := []string{"apiServer", "dataServer"}
+	for _, exchange := range exchanges {
+		err := mq.channel.ExchangeDeclare(
+			exchange,
+			"fanout",
+			true,  // durable
+			false, // auto-deleted
+			false, // internal
+			false, // no-wait
+			nil,   // arguments
+		)
+		if err != nil {
+			log.Println("ExchangeDeclare err=", err)
+		} else {
+			log.Println("ExchangeDeclare success ,", exchange)
+		}
+	}
 }
 
 func New(s string) *RabbitMQ {
@@ -23,7 +47,7 @@ func New(s string) *RabbitMQ {
 	if e != nil {
 		panic(e)
 	}
-
+	//为每个实例生成唯一队列名称
 	q, e := ch.QueueDeclare(
 		"",    // name
 		false, // durable
@@ -61,6 +85,7 @@ func (q *RabbitMQ) Send(queue string, body interface{}) {
 	if e != nil {
 		panic(e)
 	}
+	//使用默认直连交换机
 	e = q.channel.PublishWithContext(context.Background(), "",
 		queue,
 		false,

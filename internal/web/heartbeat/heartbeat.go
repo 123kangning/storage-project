@@ -20,7 +20,7 @@ var mutex sync.RWMutex                       //处理并发的锁
 func ListenHeartbeat() {
 	q := rabbitmq.New(conf.RabbitmqServer)
 	defer q.Close()
-	q.Bind("apiServers")
+	q.Bind("apiServer")
 	c := q.Consume()
 	// 移除过期节点
 	go removeExpiredDataServer()

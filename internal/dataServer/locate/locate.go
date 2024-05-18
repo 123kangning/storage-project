@@ -44,7 +44,7 @@ func Del(hash string) {
 func StartLocate() {
 	q := rabbitmq.New(conf.RabbitmqServer)
 	defer q.Close()
-	q.Bind("dataServers")
+	q.Bind("dataServer")
 	c := q.Consume()
 	for msg := range c {
 		//提取出要查找的文件hash值
