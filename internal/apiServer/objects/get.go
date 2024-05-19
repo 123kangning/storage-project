@@ -9,16 +9,23 @@ import (
 	"net/url"
 	"os"
 	"storage/infra/dal"
+	"storage/internal/apiServer/heartbeat"
+	"storage/internal/apiServer/locate"
 	rs2 "storage/internal/pkg/rs"
-	"storage/internal/web/heartbeat"
-	"storage/internal/web/locate"
 	"storage/myes"
 	"time"
 )
 
+type File struct {
+	Name string `json:"name"`
+	Hash string `json:"hash"`
+}
+type SearchResponseData struct {
+	Files []File `json:"files"`
+}
 type SearchResponse struct {
-	BaseResp BaseResp
-	Files    []string `json:"Files"`
+	BaseResp BaseResp           `json:"baseResp"`
+	Data     SearchResponseData `json:"data"`
 }
 
 // Search es查询
@@ -33,7 +40,10 @@ func Search(c *gin.Context) {
 		return
 	}
 	for _, file := range files {
-		resp.Files = append(resp.Files, file.Name)
+		resp.Data.Files = append(resp.Data.Files, File{
+			Name: file.Name,
+			Hash: file.Hash,
+		})
 	}
 	c.JSON(http.StatusOK, resp)
 }
@@ -41,19 +51,19 @@ func Search(c *gin.Context) {
 // Get 精确取出对象，按照name取
 func Get(c *gin.Context) {
 	resp := &BaseResp{}
-	name, err := url.QueryUnescape(c.Query("name"))
+	hash, err := url.QueryUnescape(c.Query("hash"))
 	if err != nil {
 		resp.Set(1, "文件名称解析出错")
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-	file := dal.Get(name) //	从ES中取出来
+	file := dal.Get(hash) //	从MySQL中取出来
 	if file.Hash == "" {  //空的就是没找到咯，del里面删除不就是置空吗
 		resp.Set(1, "未找到该文件")
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-	hash := url.PathEscape(file.Hash) //对字符串转义，保证传输过程中的安全
+	hash = url.PathEscape(file.Hash) //对字符串转义，保证传输过程中的安全
 	stream, e := GetStream(hash, file.Size)
 	if e != nil {
 		log.Println(e)
@@ -80,14 +90,14 @@ func Get(c *gin.Context) {
 	//stream.Read(buf)
 	//log.Println("stream = ", string(buf))
 	//resp.file, e = streamToFile(stream)
-	f, e := os.CreateTemp("", name+time.Now().Format("2006-01-02 15:04:05"))
+	f, e := os.CreateTemp("", hash+time.Now().Format("2006-01-02 15:04:05"))
 	defer os.Remove(f.Name())
 	io.Copy(f, stream)
 	if e != nil {
 		resp.Set(1, e.Error())
 		c.JSON(http.StatusOK, resp)
 	} else {
-		c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s", name))
+		c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s", hash))
 		//fmt.Sprintf("attachment; filename=%s", filename)对下载的文件重命名
 		c.Writer.Header().Add("Content-Type", "application/octet-stream")
 		resp.Set(0, "success")

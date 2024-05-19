@@ -7,8 +7,8 @@ import (
 )
 
 type home struct {
-	BaseResp BaseResp
-	Files    []dal2.File
+	BaseResp BaseResp    `json:"baseResp"`
+	Files    []dal2.File `json:"files"`
 }
 
 func Home(c *gin.Context) { //获取所有的Metadata集合

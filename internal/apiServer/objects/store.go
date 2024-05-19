@@ -5,8 +5,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"storage/internal/apiServer/locate"
 	"storage/internal/pkg/utils"
-	"storage/internal/web/locate"
 )
 
 func storeObject(r io.Reader, hash string, size int64) (int, error) {

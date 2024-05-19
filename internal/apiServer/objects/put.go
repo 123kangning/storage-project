@@ -6,13 +6,13 @@ import (
 	"log"
 	"net/http"
 	"storage/infra/dal"
+	"storage/internal/apiServer/heartbeat"
 	rs2 "storage/internal/pkg/rs"
-	"storage/internal/web/heartbeat"
 )
 
 type BaseResp struct {
-	StatusCode    int
-	StatusMessage string
+	StatusCode    int    `json:"statusCode"`
+	StatusMessage string `json:"statusMessage"`
 }
 
 func (r *BaseResp) Set(code int, message string) {

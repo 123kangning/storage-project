@@ -1,19 +1,19 @@
 #!/bin/bash
 
-web_pid=$(pgrep -f "web")
-if [[ -n "$apiServer_pid" ]]; then
+# 停止 apiServer
+apiServer_pids=$(pgrep -f "apiServer")
+if [[ -n "$apiServer_pids" ]]; then
     echo "Stopping apiServer ..."
-    kill $apiServer_pid
+    for pid in $apiServer_pids; do
+        kill "$pid"
+    done
 fi
 
-dataServer_pid=$(pgrep -f "dataServer")
-if [[ -n "$dataServer_pid" ]]; then
+# 停止 dataServer
+dataServer_pids=$(pgrep -f "dataServer")
+if [[ -n "$dataServer_pids" ]]; then
     echo "Stopping dataServer ..."
-    kill $dataServer_pid
-fi
-
-webServer_pid=$(pgrep -f "webServer")
-if [[ -n "$webServer_pid" ]]; then
-    echo "Stopping webServer ..."
-    kill $webServer_pid
+    for pid in $dataServer_pids; do
+        kill "$pid"
+    done
 fi

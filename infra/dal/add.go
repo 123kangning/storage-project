@@ -14,9 +14,9 @@ type File struct {
 }
 
 func Add(name, hash string, size int64) error {
-	file := Get(name)
+	file := Get(hash)
 	if file.Hash != "" {
-		return errors.New("命名冲突，请先删除重名文件")
+		return errors.New("内容冲突，请先删除重复文件")
 	}
 	// 准备预编译语句
 	stmt, err := DB.Prepare("INSERT INTO file(name,size,hash,is_delete,update_at) VALUES (?,?,?,false,?)")

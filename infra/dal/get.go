@@ -6,24 +6,23 @@ import (
 )
 
 // Get 精确获取单个文件
-func Get(name string) File {
+func Get(hash string) File {
 	// 准备预编译语句
-	stmt, err := DB.Prepare("select name,size,hash,update_at from file where name = ? and not is_delete order by 'update_at' desc")
+	stmt, err := DB.Prepare("select name,size,hash,update_at from file where hash = ? and is_delete=0 order by 'update_at' desc")
 	if err != nil {
-		log.Fatal("err1 = ", err)
+		log.Fatal("Prepare failed,err = ", err)
 	}
 	defer stmt.Close()
 
-	// 执行预编译语句插入数据
-	rows, err := stmt.Query(name)
+	rows, err := stmt.Query(hash)
 	if err != nil {
-		log.Fatal("err2 = ", err)
+		log.Fatal("Query failed,err = ", err)
 	}
 	var file File
 	if rows.Next() {
 		err = rows.Scan(&file.Name, &file.Size, &file.Hash, &file.UpdateAt)
 		if err != nil {
-			log.Println("err3 = ", err)
+			log.Println("get file failed,err = ", err)
 		}
 	}
 	return file
@@ -38,7 +37,6 @@ func GetAll() []File {
 	}
 	defer stmt.Close()
 
-	// 执行预编译语句插入数据
 	rows, err := stmt.Query()
 	if err != nil {
 		log.Fatal(err)
@@ -48,7 +46,7 @@ func GetAll() []File {
 		var file File
 		var t time.Time
 		err = rows.Scan(&file.Name, &file.Size, &file.Hash, &t)
-		file.UpdateAt = t.Format("2006-01-02 15:04:05")
+		file.UpdateAt = t.Format(time.DateTime)
 		if err != nil {
 			log.Println(err)
 		}
