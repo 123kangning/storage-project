@@ -6,7 +6,7 @@
 - `conf`目录下存放配置信息以及数据库初始化文件
 	- `my.cnf` 配置运行canal所需配置
 	- `init.sql` 创建file用户和canal用户，file用户用于业务上的操作数据库，canal用户用于canal同步数据订阅binlog时使用
-- `dao`目录下存放数据库操作代码
+- `infra`目录下存放数据库操作代码
 - `internal`
 	- `apiServer`负责处理用户请求,apiServer通过消息队列收集所有可用dataServer节点地址，实现了两个模块之间的解耦。
  	- `dataServer`负责执行真正意义上的数据读写。
