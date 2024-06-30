@@ -58,7 +58,7 @@ func Get(c *gin.Context) {
 		return
 	}
 	file := dal.Get(hash) //	从MySQL中取出来
-	if file.Hash == "" {  //空的就是没找到咯，del里面删除不就是置空吗
+	if file.Hash == "" {
 		resp.Set(1, "未找到该文件")
 		c.JSON(http.StatusOK, resp)
 		return
@@ -71,40 +71,27 @@ func Get(c *gin.Context) {
 		c.JSON(http.StatusNotFound, resp)
 		return
 	}
-	//可选 gzip进行压缩
-	//acceptGzip := false
-	//encoding := c.GetHeader("Accept-Encoding")
-	//if encoding == "gzip" {
-	//	acceptGzip = true
-	//}
-	//if acceptGzip {
-	//	c.Header("content-encoding", "gzip")
-	//	//w.Header().Set("content-encoding", "gzip")
-	//	w2 := gzip.NewWriter(w)
-	//	io.Copy(w2, stream)
-	//	w2.Close()
-	//} else {
-	//	io.Copy(c.w, stream)
-	//}
-	//buf := make([]byte, 10000)
-	//stream.Read(buf)
-	//log.Println("stream = ", string(buf))
-	//resp.file, e = streamToFile(stream)
-	f, e := os.CreateTemp("", hash+time.Now().Format("2006-01-02 15:04:05"))
-	defer os.Remove(f.Name())
-	io.Copy(f, stream)
+	defer stream.Close()
+
+	//创建临时文件
+	f, e := os.CreateTemp("", hash+time.Now().Format(time.DateTime))
 	if e != nil {
 		resp.Set(1, e.Error())
 		c.JSON(http.StatusOK, resp)
-	} else {
+		return
+	}
+	defer os.Remove(f.Name())
+
+	if f != nil {
+		if _, err = io.Copy(f, stream); err != nil {
+			return
+		}
 		c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s", hash))
 		//fmt.Sprintf("attachment; filename=%s", filename)对下载的文件重命名
 		c.Writer.Header().Add("Content-Type", "application/octet-stream")
 		resp.Set(0, "success")
 		c.File(f.Name())
 	}
-	//c.JSON(http.StatusOK, resp)
-	stream.Close()
 }
 
 func GetStream(hash string, size int64) (*rs2.RSGetStream, error) {

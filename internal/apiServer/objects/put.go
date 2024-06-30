@@ -24,7 +24,12 @@ func Put(c *gin.Context) {
 	resp := &BaseResp{}
 
 	file, err := c.FormFile("file")
-	//log.Println("file = ", file, " err = ", err)
+	if err != nil {
+		log.Println("file error , ", err)
+		resp.Set(1, fmt.Sprintln("file error , ", err))
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
 	r, err := file.Open()
 
 	if err != nil {
@@ -35,6 +40,14 @@ func Put(c *gin.Context) {
 	}
 	//get hash
 	hash := c.GetHeader("hash")
+
+	resFile := dal.Get(hash)
+	if resFile.Hash == hash {
+		resp.Set(1, "file already exists")
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+
 	code, e := storeObject(r, hash, file.Size) //存储文件到/objects,返回状态码以及error
 	if e != nil || code != http.StatusOK {
 		log.Println(e)
