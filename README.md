@@ -9,7 +9,7 @@
 - `infra`目录下存放数据库操作代码
 - `internal`
 	- `apiServer`负责处理用户请求,apiServer通过消息队列收集所有可用dataServer节点地址，实现了两个模块之间的解耦。
- 	- `dataServer`负责执行真正意义上的数据读写。
+ 	- `dataServer`负责执行真正意义上的数据读写,文件commit时进行gzip压缩，读取时进行解压缩，传输过程不压缩。
 	- `pkg`目录下多种操作整合的代码
 		- `objectstream`用于将文件对象转化为stream流`向dataServer中存储或者从dataServer中获取`
 		- `rabbitmq`放置消息队列相关操作：
