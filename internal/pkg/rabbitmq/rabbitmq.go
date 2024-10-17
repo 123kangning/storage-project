@@ -69,7 +69,7 @@ func New(s string) *RabbitMQ {
 
 func (q *RabbitMQ) Bind(exchange string) {
 	e := q.channel.QueueBind(
-		q.Name,   // queue name
+		q.Name,   // queue name,之前生成的唯一队列名称
 		"",       // routing key
 		exchange, // exchange
 		false,
