@@ -1,0 +1,35 @@
+{
+  "type": "page",
+  "body": [
+    {
+      "type": "form",
+      "api": "put: /file/put",
+      "debug": true,
+      "body": [
+        {
+          "type": "input-file",
+          "name": "file",
+          "label": "File",
+          "accept": "*",
+          "asBlob": true,
+          "id": "u:0b27e12f1b1a"
+        }
+      ],
+      "id": "u:18a70dba8ec0",
+      "actions": [
+        {
+          "type": "submit",
+          "label": "提交",
+          "primary": true,
+          "id": "u:72423f1b3092"
+        }
+      ],
+      "feat": "Insert"
+    }
+  ],
+  "id": "u:1561a400962c",
+  "asideResizor": false,
+  "pullRefresh": {
+    "disabled": true
+  }
+}

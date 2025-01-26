@@ -12,9 +12,6 @@ sudo ifconfig wlan0:3 10.29.1.3/16
 sudo ifconfig wlan0:4 10.29.1.4/16
 sudo ifconfig wlan0:5 10.29.1.5/16
 sudo ifconfig wlan0:6 10.29.1.6/16
-sudo ifconfig wlan0:7 10.29.2.1/16
-sudo ifconfig wlan0:8 10.29.2.2/16
-sudo ifconfig wlan0:9 10.29.3.1/16
 
 #以下适用于mac
 

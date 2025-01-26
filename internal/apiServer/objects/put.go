@@ -3,21 +3,23 @@ package objects
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"io"
 	"log"
 	"net/http"
 	"storage/infra/dal"
 	"storage/internal/apiServer/heartbeat"
 	rs2 "storage/internal/pkg/rs"
+	"storage/internal/pkg/utils"
 )
 
 type BaseResp struct {
-	StatusCode    int    `json:"statusCode"`
-	StatusMessage string `json:"statusMessage"`
+	Code    int    `json:"code"`
+	Message string `json:"message"`
 }
 
 func (r *BaseResp) Set(code int, message string) {
-	r.StatusCode = code
-	r.StatusMessage = message
+	r.Code = code
+	r.Message = message
 }
 func Put(c *gin.Context) {
 	log.Println("api.object.put")
@@ -30,6 +32,7 @@ func Put(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, resp)
 		return
 	}
+
 	r, err := file.Open()
 
 	if err != nil {
@@ -39,7 +42,14 @@ func Put(c *gin.Context) {
 		return
 	}
 	//get hash
-	hash := c.GetHeader("hash")
+	hash := utils.CalculateHash(r)
+
+	_, err = r.Seek(0, io.SeekStart)
+	if err != nil {
+		log.Println("file Seek error , ", err)
+		resp.Set(1, fmt.Sprintln("file Seek error , ", err))
+		return
+	} //重置reader的位置
 
 	resFile := dal.Get(hash)
 	if resFile.Hash == hash {

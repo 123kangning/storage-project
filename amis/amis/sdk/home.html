@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8" />
+    <title>amis admin</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link
+            rel="stylesheet"
+            title="default"
+            href="https://unpkg.com/amis@3.2.0/sdk/sdk.css"
+    />
+    <link rel="stylesheet" href="https://unpkg.com/amis@3.2.0/sdk/helper.css" />
+    <link
+            rel="stylesheet"
+            href="https://unpkg.com/amis@3.2.0/sdk/iconfont.css"
+    />
+    <script src="https://unpkg.com/amis@3.2.0/sdk/sdk.js"></script>
+    <script src="https://unpkg.com/vue@2"></script>
+    <script src="https://unpkg.com/history@4.10.1
+/umd/history.js"></script>
+    <style>
+        html,
+        body,
+        .app-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="root" class="app-wrapper"></div>
+<script>
+    (function () {
+        let amis = amisRequire('amis/embed');
+        const history = History.createHashHistory();
+
+        const app = JSON.parse({{.App}});
+
+        function isCurrentUrl(to, ctx, aaa) {
+            if (!to) {
+                return false;
+            }
+
+            if (history && history.location.pathname == to) {
+                return true;
+            }
+            return false;
+        }
+        let amisInstance = amis.embed('#root', app, { location: history.location }, {
+            // 主题, 换的时候,需要把css也同时更新
+            theme: 'antd',
+            // 全局 api 适配器。另外在 amis 配置项中的 api 也可以配置适配器，针对某个特定接口单独处理。
+            responseAdaptor: (api, response, query, request) => {
+                if (response.hasOwnProperty("code")) {
+                    response = {
+                        "status": response.code,
+                        "msg": response.msg,
+                        "data": response.data
+                    }
+                }
+                if (response.status == 1004 && response.data.hasOwnProperty("login_url")) {
+                    window.location.href = response.data.login_url + "?"+ encodeURIComponent(window.location.href);
+                }
+
+                return response;
+            },
+
+            // 监听路由变化
+            watchRouteChange: fn => {
+                return history.listen(fn);
+            },
+
+            // 用来接管页面跳转，比如用 location.href 或 window.open，或者自己实现 amis 配置更新
+            jumpTo: (to, action) => {
+                if (to === 'goBack') {
+                    return history.goBack();
+                }
+                if (isCurrentUrl(to)) {
+                    return;
+                }
+
+                history.push({ pathname: to, search: '', state: {} })
+            },
+
+            // 用来实现地址栏更新
+            updateLocation: (to, replace) => {
+                return; // 这里不进行地址栏更新
+            },
+
+            // 用来判断是否目标地址当前地址。
+            isCurrentUrl: isCurrentUrl
+        });
+
+        history.listen(state => { amisInstance.updateProps({ location: state.location }); });
+    })();
+</script>
+</body>
+</html>

@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"os"
 	"storage/internal/apiServer/heartbeat"
 	"storage/internal/apiServer/locate"
 	"storage/myes"
@@ -17,7 +16,7 @@ func main() {
 	go myes.Init()
 	go myes.Run()
 	r := InitRouter()
-	err := r.Run(os.Getenv("LISTEN_ADDRESS"))
+	err := r.Run(":8081")
 	if err != nil {
 		panic(err)
 	}

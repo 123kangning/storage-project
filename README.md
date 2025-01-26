@@ -19,7 +19,8 @@
 - `myes`目录下存放操作es以及canal同步数据的代码
 ## 项目运行
 1. 执行`docker-compose up -d`启动es相关环境
-2. 运行`cmd`目录下的`inittestenv.sh`初始化网络和文件存储地址和`starttestenv.sh`启动server
+2. cd到`amis`目录下，按照README.md中的步骤启动前端服务
+3. 运行`cmd`目录下的`inittestenv.sh`初始化网络和文件存储地址和`restarttestenv.sh`启动server
 ## 接口文档
 - 主目录下`api/storage.openapi.json`文件
 - 使用方法：通过`Apifox`等工具将该文件导入，导入时选择`OpenAPI/Swagger`数据格式，构建出项目的`API`文档

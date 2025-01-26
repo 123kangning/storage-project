@@ -1,0 +1,35 @@
+{
+  "type": "app",
+  "logo": "https://static-inc.xiwang.com/users_inner_thoughts/%E5%AE%A2%E6%88%B7%E4%B9%8B%E5%A3%B0_big.png",
+  "brandName": "文件存储平台",
+  "pages": [
+    {
+      "visible": true,
+      "url": "/",
+      "label": "主页",
+      "redirect": "/list"
+    },
+    {
+      "visible": false,
+      "label": "文件管理",
+      "icon": "fa fa-cube",
+      "children": [
+        {
+          "visible": true,
+          "url": "/list",
+          "label": "文件列表",
+          "icon": "fa fa-cube",
+          "schemaApi": "/file/schema?page_key=list"
+        },
+        {
+          "visible": true,
+          "url": "/put",
+          "label": "文件上传",
+          "icon": "fa fa-cube",
+          "schemaApi": "/file/schema?page_key=put_file"
+        }
+      ]
+    }
+  ],
+  "id": "u:e845302d7cc2"
+}

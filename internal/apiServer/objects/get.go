@@ -24,14 +24,22 @@ type SearchResponseData struct {
 	Files []File `json:"files"`
 }
 type SearchResponse struct {
-	BaseResp BaseResp           `json:"baseResp"`
+	BaseResp `json:"baseResp"`
 	Data     SearchResponseData `json:"data"`
 }
 
 // Search es查询
 func Search(c *gin.Context) {
 	name := c.Query("name")
-	resp := SearchResponse{}
+	resp := SearchResponse{
+		Data: SearchResponseData{
+			Files: make([]File, 0),
+		},
+		BaseResp: BaseResp{
+			Code:    0,
+			Message: "success",
+		},
+	}
 	files, err := myes.GetFile(name)
 	if err != nil {
 		resp.BaseResp.Set(1, err.Error())
