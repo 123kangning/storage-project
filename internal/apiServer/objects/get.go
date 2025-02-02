@@ -94,7 +94,7 @@ func Get(c *gin.Context) {
 		if _, err = io.Copy(f, stream); err != nil {
 			return
 		}
-		c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s", hash))
+		c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s", file.Name))
 		//fmt.Sprintf("attachment; filename=%s", filename)对下载的文件重命名
 		c.Writer.Header().Add("Content-Type", "application/octet-stream")
 		resp.Set(0, "success")

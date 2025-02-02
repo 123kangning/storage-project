@@ -19,11 +19,14 @@
 - `myes`目录下存放操作es以及canal同步数据的代码
 ## 项目运行
 1. 执行`docker-compose up -d`启动es相关环境
-2. cd到`amis`目录下，按照README.md中的步骤启动前端服务
-3. 运行`cmd`目录下的`inittestenv.sh`初始化网络和文件存储地址和`restarttestenv.sh`启动server
+2. rabbitmq如果没启动，`sudo systemctl restart rabbitmq`
+3. cd到`amis`目录下，按照README.md中的步骤启动前端服务
+4. 运行`cmd`目录下的`inittestenv.sh`初始化网络和文件存储地址和`restarttestenv.sh`启动server
 ## 接口文档
 - 主目录下`api/storage.openapi.json`文件
 - 使用方法：通过`Apifox`等工具将该文件导入，导入时选择`OpenAPI/Swagger`数据格式，构建出项目的`API`文档
 ## TODO
 1. 数据同步到ES时，针对MySQL中不同操作对ES进行定制化更新，保证了数据的精炼，但同时损失了一部分灵活性。
 2. 后期可以做一个数据池，在同步数据时，进行简单地过滤，将过滤之后的数据全量写入ES，会多占用一些空间，但有原始数据可供使用，为之后的功能修改提供了灵活性。
+
+- 遇到大文件，gin框架 FromFile报错file error ,  multipart: NextPart: unexpected EOF。amis的问题，文件过大时，有时传不过来，apifox是可以调通的。

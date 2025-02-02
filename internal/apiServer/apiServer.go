@@ -1,9 +1,7 @@
 package main
 
 import (
-	"net/http"
 	"storage/internal/apiServer/heartbeat"
-	"storage/internal/apiServer/locate"
 	"storage/myes"
 )
 
@@ -20,5 +18,4 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	http.HandleFunc("/locate/", locate.Handler)
 }

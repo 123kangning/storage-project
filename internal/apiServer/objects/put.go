@@ -26,6 +26,7 @@ func Put(c *gin.Context) {
 	resp := &BaseResp{}
 
 	file, err := c.FormFile("file")
+	log.Println("from file complete")
 	if err != nil {
 		log.Println("file error , ", err)
 		resp.Set(1, fmt.Sprintln("file error , ", err))
