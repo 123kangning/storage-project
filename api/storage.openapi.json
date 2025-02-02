@@ -10,16 +10,18 @@
     "/file/put": {
       "put": {
         "summary": "上传",
+        "x-apifox-folder": "",
+        "x-apifox-status": "developing",
         "deprecated": false,
         "description": "",
         "tags": [],
         "parameters": [
           {
-            "name": "hash",
+            "name": "Content-Type",
             "in": "header",
-            "description": "sha256",
-            "required": false,
-            "example": "1a799eb03e1849401d29da3a7062b73da10727c2de26019b5d0053c59e42f797",
+            "description": "",
+            "required": true,
+            "example": "multipart/form-data",
             "schema": {
               "type": "string"
             }
@@ -32,8 +34,8 @@
                 "type": "object",
                 "properties": {
                   "file": {
-                    "example": "file:///home/kangning/speak.txt",
                     "type": "string",
+                    "example": "file:///home/kangning/speak.txt",
                     "format": "binary"
                   }
                 }
@@ -56,31 +58,38 @@
                       "type": "string"
                     }
                   },
+                  "x-apifox-orders": [
+                    "StatusCode",
+                    "StatusMessage"
+                  ],
                   "required": [
                     "StatusCode",
                     "StatusMessage"
-                  ]
+                  ],
+                  "x-apifox-ignore-properties": []
                 }
               }
             }
           }
         },
-        "security": []
+        "x-run-in-apifox": "https://apifox.com/web/project/2623267/apis/api-76728620-run"
       }
     },
     "/file/get": {
       "get": {
         "summary": "下载",
+        "x-apifox-folder": "",
+        "x-apifox-status": "developing",
         "deprecated": false,
         "description": "",
         "tags": [],
         "parameters": [
           {
-            "name": "name",
+            "name": "hash",
             "in": "query",
             "description": "",
             "required": false,
-            "example": "speak.txt",
+            "example": "79e83e9c7be4e2f1f6c2af0d727fbb07bc8dfa181c4743a568f165f9c7ff3e6e",
             "schema": {
               "type": "string"
             }
@@ -101,21 +110,28 @@
                       "type": "string"
                     }
                   },
+                  "x-apifox-orders": [
+                    "StatusCode",
+                    "StatusMessage"
+                  ],
                   "required": [
                     "StatusCode",
                     "StatusMessage"
-                  ]
+                  ],
+                  "x-apifox-ignore-properties": []
                 }
               }
             }
           }
         },
-        "security": []
+        "x-run-in-apifox": "https://apifox.com/web/project/2623267/apis/api-76730527-run"
       }
     },
     "/file/": {
       "get": {
         "summary": "主页",
+        "x-apifox-folder": "",
+        "x-apifox-status": "developing",
         "deprecated": false,
         "description": "",
         "tags": [],
@@ -127,28 +143,32 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {}
+                  "properties": {},
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": []
                 }
               }
             }
           }
         },
-        "security": []
+        "x-run-in-apifox": "https://apifox.com/web/project/2623267/apis/api-77685110-run"
       }
     },
     "/file/del": {
       "delete": {
         "summary": "删除",
+        "x-apifox-folder": "",
+        "x-apifox-status": "developing",
         "deprecated": false,
         "description": "",
         "tags": [],
         "parameters": [
           {
-            "name": "name",
+            "name": "hash",
             "in": "query",
             "description": "",
             "required": false,
-            "example": "speak.txt",
+            "example": "79e83e9c7be4e2f1f6c2af0d727fbb07bc8dfa181c4743a568f165f9c7ff3e6e",
             "schema": {
               "type": "string"
             }
@@ -162,28 +182,42 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "StatusCode": {
+                    "statusCode": {
                       "type": "integer"
                     },
-                    "StatusMessage": {
+                    "statusMessage": {
                       "type": "string"
                     }
                   },
+                  "x-apifox-orders": [
+                    "01HY8K4HYX38XCVZSMSPKHQ43G"
+                  ],
                   "required": [
-                    "StatusCode",
-                    "StatusMessage"
+                    "statusCode",
+                    "statusMessage"
+                  ],
+                  "x-apifox-refs": {
+                    "01HY8K4HYX38XCVZSMSPKHQ43G": {
+                      "$ref": "#/components/schemas/BaseResp"
+                    }
+                  },
+                  "x-apifox-ignore-properties": [
+                    "statusCode",
+                    "statusMessage"
                   ]
                 }
               }
             }
           }
         },
-        "security": []
+        "x-run-in-apifox": "https://apifox.com/web/project/2623267/apis/api-99819514-run"
       }
     },
     "/file/search": {
       "get": {
         "summary": "查找",
+        "x-apifox-folder": "",
+        "x-apifox-status": "developing",
         "deprecated": false,
         "description": "",
         "tags": [],
@@ -207,26 +241,99 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "BaseResp": {
+                    "baseResp": {
                       "$ref": "#/components/schemas/BaseResp"
                     },
-                    "Files": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "files": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "hash": {
+                                "type": "string"
+                              }
+                            },
+                            "x-apifox-orders": [
+                              "name",
+                              "hash"
+                            ],
+                            "required": [
+                              "name",
+                              "hash"
+                            ],
+                            "x-apifox-ignore-properties": []
+                          }
+                        }
+                      },
+                      "x-apifox-orders": [
+                        "files"
+                      ],
+                      "x-apifox-refs": {},
+                      "required": [
+                        "files"
+                      ],
+                      "x-apifox-ignore-properties": []
                     }
                   },
+                  "x-apifox-orders": [
+                    "baseResp",
+                    "data"
+                  ],
                   "required": [
-                    "Files",
-                    "BaseResp"
-                  ]
+                    "baseResp",
+                    "data"
+                  ],
+                  "x-apifox-ignore-properties": []
                 }
               }
             }
           }
         },
-        "security": []
+        "x-run-in-apifox": "https://apifox.com/web/project/2623267/apis/api-100783822-run"
+      }
+    },
+    "/file/schema": {
+      "get": {
+        "summary": "配置",
+        "x-apifox-folder": "",
+        "x-apifox-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "page_key",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/2623267/apis/api-257479245-run"
       }
     }
   },
@@ -252,31 +359,45 @@
             "description": "删除之后该字段为1"
           }
         },
+        "x-apifox-orders": [
+          "name",
+          "size",
+          "hash",
+          "updateAt",
+          "isDelete"
+        ],
         "required": [
           "name",
           "size",
           "hash",
           "updateAt",
           "isDelete"
-        ]
+        ],
+        "x-apifox-ignore-properties": [],
+        "x-apifox-folder": ""
       },
       "BaseResp": {
         "type": "object",
         "properties": {
-          "StatusCode": {
+          "statusCode": {
             "type": "integer"
           },
           "statusMessage": {
             "type": "string"
           }
         },
-        "required": [
-          "StatusCode",
+        "x-apifox-orders": [
+          "statusCode",
           "statusMessage"
-        ]
+        ],
+        "required": [
+          "statusCode",
+          "statusMessage"
+        ],
+        "x-apifox-ignore-properties": [],
+        "x-apifox-folder": ""
       }
-    },
-    "securitySchemes": {}
+    }
   },
   "servers": []
 }
