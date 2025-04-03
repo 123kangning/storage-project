@@ -1,13 +1,20 @@
-package main
+package test
 
 import (
 	"encoding/json"
 	"log"
 	"storage/myes"
+	"testing"
 	"time"
 )
 
-func main() {
+func TestRun(t *testing.T) {
+	go myes.Init()
+	time.Sleep(time.Second) //客户端启动需要一定的时间，所以要睡1s,否则client来不及赋值，就为nil
+	myes.Run()
+}
+
+func TestGet(t *testing.T) {
 	go myes.Init()
 	time.Sleep(time.Second)
 	testGet("文档")

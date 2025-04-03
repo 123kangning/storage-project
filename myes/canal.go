@@ -5,6 +5,7 @@ import (
 	"github.com/go-mysql-org/go-mysql/canal"
 	"github.com/go-mysql-org/go-mysql/mysql"
 	"github.com/go-mysql-org/go-mysql/replication"
+	"log"
 	"storage/conf"
 )
 
@@ -39,12 +40,13 @@ func (h *BinlogSync) OnXID(header *replication.EventHeader, m mysql.Position) er
 
 // OnRow 获取 event_type 为 write_rows, update_rows, delete_rows 的数据
 func (h *BinlogSync) OnRow(ev *canal.RowsEvent) error {
-	fmt.Println("原始数据：", ev.Rows)
-	fmt.Printf("sql的操作行为：%s\t", ev.Action)
-
-	for idx := range ev.Table.PKColumns {
-		fmt.Printf("主键为：%s\n", ev.Table.Columns[ev.Table.PKColumns[idx]].Name)
+	log.Println("原始数据：", ev.Rows)
+	if ev.Table.Name != "file" {
+		log.Println("表名不匹配,不处理")
+		return nil
 	}
+	log.Printf("sql的操作行为：%s\t", ev.Action)
+
 	switch ev.Action {
 	case canal.InsertAction:
 		{
@@ -67,6 +69,7 @@ func insertFunc(ev *canal.RowsEvent) {
 	for columnIndex, currColumn := range ev.Table.Columns {
 		after[currColumn.Name] = ev.Rows[0][columnIndex]
 	}
+	fmt.Printf("%+v\n", ev)
 	fmt.Println("after = ", after)
 	fmt.Println(after["size"].(int32), after["id"].(int64), after["name"].(string), after["hash"].(string))
 	AddFile(after["size"].(int32), after["id"].(int64), after["name"].(string), after["hash"].(string))
@@ -107,7 +110,9 @@ func Run() {
 		Charset:  "utf8mb4",
 		ServerID: conf.ServerID,
 		Dump: canal.DumpConfig{
-			TableDB: "file",
+			TableDB:   "file",
+			Tables:    []string{"file"},
+			Databases: []string{"file"},
 		},
 	}
 	// 表名

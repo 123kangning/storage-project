@@ -1,9 +1,11 @@
 #!/bin/bash
 
+prefix=~/storage_data
+
 for i in $(seq 1 6); do
-  mkdir -p /tmp/$i/objects
-  mkdir -p /tmp/$i/temp
-  mkdir -p /tmp/$i/garbage
+  mkdir -p ${prefix}/$i/objects
+  mkdir -p ${prefix}/$i/temp
+  mkdir -p ${prefix}/$i/garbage
 done
 
 sudo ifconfig wlan0:1 10.29.1.1/16

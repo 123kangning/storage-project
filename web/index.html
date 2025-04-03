@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件上传与查询</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 侧边栏样式 */
+        #sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 200px;
+            background-color: #1f2937;
+            color: white;
+            padding: 20px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 侧边栏顶部的 logo 和标题样式 */
+        #sidebar-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #sidebar-header img {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+        }
+
+        #sidebar-header h3 {
+            margin: 0;
+        }
+
+        #sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #sidebar ul li {
+            margin-bottom: 15px;
+            transition: background-color 0.3s ease;
+        }
+
+        #sidebar ul li:hover {
+            background-color: #374151;
+            border-radius: 5px;
+        }
+
+        #sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        #sidebar ul li a i {
+            margin-right: 10px;
+        }
+
+        /* 主内容区域样式 */
+        #main-content {
+            margin-left: 200px;
+            padding: 20px;
+            flex: 1;
+        }
+
+        /* 隐藏初始的内容区域 */
+        .content-section {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+<!-- 侧边栏 -->
+<div id="sidebar">
+    <div id="sidebar-header">
+        <!-- 这里可以替换为你的 logo 图片路径，目前使用的是一个示例图标 -->
+        <h5>文件存储平台</h5>
+    </div>
+    <ul>
+        <li><a href="#" id="uploadLink"><i class="fas fa-upload"></i> 文件上传</a></li>
+        <li><a href="#" id="searchLink"><i class="fas fa-search"></i> 文件查询</a></li>
+    </ul>
+</div>
+
+<!-- 主内容区域 -->
+<div id="main-content">
+    <!-- 文件上传部分 -->
+    <div id="uploadSection" class="content-section active">
+        <h2>文件上传</h2>
+        <form id="uploadForm" action="/file/put" method="put" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="file" class="form-label">File</label>
+                <input type="file" class="form-control" id="file" name="file" accept="*">
+            </div>
+            <button type="submit" class="btn btn-primary">提交</button>
+        </form>
+    </div>
+
+    <!-- 文件查询部分 -->
+    <div id="searchSection" class="content-section">
+        <h2>文件列表查询</h2>
+        <form id="searchForm">
+            <div class="mb-3">
+                <label for="name" class="form-label">文件名</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="-" />
+            </div>
+            <button type="submit" class="btn btn-primary">查询</button>
+            <button type="reset" class="btn btn-secondary">重置</button>
+        </form>
+        <table id="fileTable" class="table table-striped">
+            <thead>
+            <tr>
+                <th>文件名</th>
+                <th>文件hash</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function removeActiveClass() {
+        const sidebarItems = document.querySelectorAll('#sidebar ul li a');
+        sidebarItems.forEach(item => {
+            item.classList.remove('active');
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const uploadLink = document.getElementById('uploadLink');
+        const searchLink = document.getElementById('searchLink');
+        const uploadSection = document.getElementById('uploadSection');
+        const searchSection = document.getElementById('searchSection');
+
+        uploadLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            removeActiveClass();
+            this.classList.add('active');
+            hideAllSections();
+            uploadSection.classList.add('active');
+        });
+
+        searchLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            removeActiveClass();
+            this.classList.add('active');
+            hideAllSections();
+            searchSection.classList.add('active');
+        });
+
+        function hideAllSections() {
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+        }
+
+        // 文件上传表单提交事件
+        const uploadForm = document.getElementById('uploadForm');
+        uploadForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch('http://localhost/file/put/', {
+                method: 'put',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code!== 0) {
+                        console.error('文件上传失败,', data.message);
+                        alert(data.message);
+                    } else {
+                        console.log('文件上传成功', data);
+                        alert('文件上传成功');
+                    }
+                })
+                .catch(error => {
+                    console.error('文件上传失败', error);
+                });
+        });
+
+        // 文件查询表单提交事件
+        const searchForm = document.getElementById('searchForm');
+        searchForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const name = formData.get('name');
+            const url = `http://localhost/file/search?name=${name}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('文件查询成功', data.data);
+                    // 清空表格现有数据
+                    const tableBody = document.getElementById('fileTable').getElementsByTagName('tbody')[0];
+                    tableBody.innerHTML = '';
+                    const realData = data.data.files;
+                    // 填充表格数据
+                    realData.forEach(file => {
+                        const row = document.createElement('tr');
+                        const nameCell = document.createElement('td');
+                        const hashCell = document.createElement('td');
+                        const operationCell = document.createElement('td');
+
+                        nameCell.textContent = file.name;
+                        hashCell.textContent = file.hash;
+
+                        const downloadButton = document.createElement('button');
+                        downloadButton.textContent = '文件下载';
+                        downloadButton.classList.add('btn', 'btn-info');
+                        downloadButton.addEventListener('click', function () {
+                            const downloadUrl = `http://localhost/file/get?hash=${file.hash}`;
+                            fetch(downloadUrl)
+                                .then(response => response.blob())
+                                .then(blob => {
+                                    const url = window.URL.createObjectURL(blob);
+                                    const a = document.createElement('a');
+                                    a.href = url;
+                                    a.download = file.name;
+                                    a.click();
+                                    window.URL.revokeObjectURL(url);
+                                })
+                                .catch(error => {
+                                    console.error('文件下载失败', error);
+                                });
+                        });
+
+                        operationCell.appendChild(downloadButton);
+
+                        row.appendChild(nameCell);
+                        row.appendChild(hashCell);
+                        row.appendChild(operationCell);
+
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('文件查询失败', error);
+                });
+        });
+    });
+</script>
+</body>
+
+</html>
