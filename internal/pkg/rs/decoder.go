@@ -1,6 +1,7 @@
 package rs
 
 import (
+	"fmt"
 	"github.com/klauspost/reedsolomon"
 	"io"
 )
@@ -55,6 +56,7 @@ func (d *decoder) getData() error {
 	for i := range shards {
 		// 如果 readers[i] 为空则说明分片数据丢失需要修复
 		if d.readers[i] == nil {
+			fmt.Println("readers[", i, "] == nil")
 			repairIds = append(repairIds, i)
 		} else {
 			// 如果 readers[i] 不为空说明分片数据正常，则将分片数据保存到 shards[i] 中

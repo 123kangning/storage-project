@@ -3,39 +3,13 @@ package myes
 import (
 	"fmt"
 	"github.com/go-mysql-org/go-mysql/canal"
-	"github.com/go-mysql-org/go-mysql/mysql"
-	"github.com/go-mysql-org/go-mysql/replication"
 	"log"
 	"storage/conf"
+	//"storage/conf"
 )
 
 type BinlogSync struct {
 	canal.DummyEventHandler
-}
-
-// OnRotate 获取 binlog 下个日志文件名字和位置
-func (h *BinlogSync) OnRotate(header *replication.EventHeader, r *replication.RotateEvent) error {
-	fmt.Printf("下一个日志为 %s 位置为 %d \n", string(r.NextLogName), r.Position)
-	return nil
-}
-
-// OnTableChanged 在 OnDDL 之前执行
-func (h *BinlogSync) OnTableChanged(header *replication.EventHeader, schema string, table string) error {
-	result := fmt.Sprintf("修改了数据库%s中表%s的结构", schema, table)
-	fmt.Println(result)
-	return nil
-}
-
-// OnDDL query 事件中的一些信息，如执行的 sql 语句
-func (h *BinlogSync) OnDDL(header *replication.EventHeader, nextPos mysql.Position, queryEvent *replication.QueryEvent) error {
-	fmt.Println(string(queryEvent.Query))
-	return nil
-}
-
-// OnXID 打印事件 Xid 的结束为止
-func (h *BinlogSync) OnXID(header *replication.EventHeader, m mysql.Position) error {
-	fmt.Println("XID", m.Pos)
-	return nil
 }
 
 // OnRow 获取 event_type 为 write_rows, update_rows, delete_rows 的数据
@@ -102,32 +76,23 @@ func updateFunc(ev *canal.RowsEvent) {
 		AddFile(after["size"].(int32), after["id"].(int64), after["name"].(string), after["hash"].(string))
 	}
 }
+
 func Run() {
-	cfg := &canal.Config{
+	c, err := canal.NewCanal(&canal.Config{
 		Addr:     conf.MysqlAddr,
 		User:     "canal",
 		Password: "canal",
-		Charset:  "utf8mb4",
 		ServerID: conf.ServerID,
-		Dump: canal.DumpConfig{
-			TableDB:   "file",
-			Tables:    []string{"file"},
-			Databases: []string{"file"},
-		},
-	}
-	// 表名
-	//cfg.Dump.Tables = []string{"file.file"}
-	//cfg.Dump.ExecutionPath = ""
-
-	c, err := canal.NewCanal(cfg)
+	})
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
-	// Register a handler to handler Events
-	c.SetEventHandler(&BinlogSync{})
+	h := &BinlogSync{}
+	c.SetEventHandler(h)
+	go Init()
 	<-Start
 	err = c.Run()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 }

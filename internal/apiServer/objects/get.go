@@ -31,6 +31,7 @@ type SearchResponse struct {
 // Search es查询
 func Search(c *gin.Context) {
 	name := c.Query("name")
+	fmt.Println("name=", name)
 	resp := SearchResponse{
 		Data: SearchResponseData{
 			Files: make([]File, 0),
@@ -76,7 +77,7 @@ func Get(c *gin.Context) {
 	if e != nil {
 		log.Println(e)
 		resp.Set(1, e.Error())
-		c.JSON(http.StatusNotFound, resp)
+		c.JSON(http.StatusOK, resp)
 		return
 	}
 	defer stream.Close()

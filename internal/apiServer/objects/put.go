@@ -26,13 +26,13 @@ func Put(c *gin.Context) {
 	resp := &BaseResp{}
 
 	file, err := c.FormFile("file")
-	log.Println("from file complete")
 	if err != nil {
 		log.Println("file error , ", err)
 		resp.Set(1, fmt.Sprintln("file error , ", err))
 		c.JSON(http.StatusBadRequest, resp)
 		return
 	}
+	log.Println("from file complete, name =", file.Filename, ",len =", len(file.Filename))
 
 	r, err := file.Open()
 
@@ -42,6 +42,7 @@ func Put(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, resp)
 		return
 	}
+	defer r.Close()
 	//get hash
 	hash := utils.CalculateHash(r)
 

@@ -8,10 +8,13 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* 全局样式 */
         body {
             padding: 0;
             display: flex;
             min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4; /* 修改背景颜色 */
         }
 
         /* 侧边栏样式 */
@@ -21,10 +24,15 @@
             left: 0;
             height: 100vh;
             width: 200px;
-            background-color: #1f2937;
+            background: linear-gradient(135deg, #2c3e50, #34495e); /* 深色渐变背景 */
             color: white;
             padding: 20px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 阴影效果 */
+        }
+
+        ul li {
+            float: left; /* 使<li>标签浮动到左边 */
+            padding: 0 10px; /* 调整内边距以增加间距 */
         }
 
         /* 侧边栏顶部的 logo 和标题样式 */
@@ -42,6 +50,11 @@
 
         #sidebar-header h3 {
             margin: 0;
+            transition: opacity 0.3s ease; /* 添加标题透明度过渡效果 */
+        }
+
+        #sidebar.collapsed #sidebar-header h3 {
+            opacity: 0;
         }
 
         #sidebar ul {
@@ -55,17 +68,22 @@
         }
 
         #sidebar ul li:hover {
-            background-color: #374151;
+            background-color: #63b3ed; /* 调整鼠标悬停时的背景颜色 */
             border-radius: 5px;
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3); /* 增强阴影 */
         }
 
         #sidebar ul li a {
             color: white;
             text-decoration: none;
-            display: block;
             padding: 10px;
             display: flex;
             align-items: center;
+            transition: opacity 0.3s ease; /* 添加链接透明度过渡效果 */
+        }
+
+        #sidebar.collapsed #sidebar ul li a span {
+            opacity: 0;
         }
 
         #sidebar ul li a i {
@@ -77,6 +95,14 @@
             margin-left: 200px;
             padding: 20px;
             flex: 1;
+            transition: margin-left 0.3s ease; /* 添加主内容区域边距过渡效果 */
+            background: linear-gradient(135deg, #f4f4f4, #eaeaea); /* 浅色渐变背景 */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+        }
+
+        #main-content.collapsed {
+            margin-left: 60px;
         }
 
         /* 隐藏初始的内容区域 */
@@ -87,8 +113,36 @@
         .active {
             display: block;
         }
+
+        /* 美化输入框样式 */
+        #uploadForm input[type="file"],
+        #searchForm input[type="text"] {
+            border: 1px solid #e2e8f0; /* 修改输入框边框颜色 */
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075); /* 添加内阴影效果 */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease; /* 添加过渡效果 */
+        }
+
+        #uploadForm input[type="file"]:focus,
+        #searchForm input[type="text"]:focus {
+            border-color: #63b3ed; /* 输入框聚焦时的边框颜色 */
+            box-shadow: 0 0 0 2px rgba(99, 179, 237, 0.2); /* 输入框聚焦时的外阴影效果 */
+            outline: none;
+        }
+
+        .reset-btn i {
+            color: #666;
+        }
+
+        .reset-btn:hover i {
+            color: #333;
+        }
     </style>
 </head>
+
+
+
 
 <body>
 <!-- 侧边栏 -->
@@ -98,8 +152,8 @@
         <h5>文件存储平台</h5>
     </div>
     <ul>
-        <li><a href="#" id="uploadLink"><i class="fas fa-upload"></i> 文件上传</a></li>
-        <li><a href="#" id="searchLink"><i class="fas fa-search"></i> 文件查询</a></li>
+        <li><a href="#" id="uploadLink"><i class="fas fa-upload"></i><span> 文件上传</span></a></li>
+        <li><a href="#" id="searchLink"><i class="fas fa-search"></i><span> 文件查询</span></a></li>
     </ul>
 </div>
 
@@ -109,11 +163,13 @@
     <div id="uploadSection" class="content-section active">
         <h2>文件上传</h2>
         <form id="uploadForm" action="/file/put" method="put" enctype="multipart/form-data">
-            <div class="mb-3">
-                <label for="file" class="form-label">File</label>
-                <input type="file" class="form-control" id="file" name="file" accept="*">
+            <div style="border: 1px solid #ccc; border-radius: 50px; padding: 10px 15px; display: flex; align-items: center; gap: 10px; background-color: #f9f9f9;">
+                <div style="position: relative; flex: 1;">
+                    <i class="fas fa-upload" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #aaa;"></i>
+                    <input type="file" class="form-control" id="file" name="file" accept="*" style="border: none; outline: none; flex: 1; background: transparent; padding-left: 30px; box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);">
+                </div>
+                <button type="submit" class="btn btn-primary" style="border-radius: 50px; padding: 5px 15px;">上传</button>
             </div>
-            <button type="submit" class="btn btn-primary">提交</button>
         </form>
     </div>
 
@@ -121,14 +177,22 @@
     <div id="searchSection" class="content-section">
         <h2>文件列表查询</h2>
         <form id="searchForm">
-            <div class="mb-3">
-                <label for="name" class="form-label">文件名</label>
-                <input type="text" class="form-control" id="name" name="name" placeholder="-" />
+            <div style="border: 1px solid #ccc; border-radius: 50px; padding: 10px 15px; display: flex; align-items: center; gap: 10px; background-color: #f9f9f9;">
+                <label for="name" class="form-label" style="margin: 0; white-space: nowrap;">文件名</label>
+                <div style="border-left: 1px solid #ccc; height: 24px; margin: 0 10px;"></div>
+                <div style="position: relative; flex: 1;">
+                    <i class="fas fa-search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #aaa;"></i>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="请输入您要检索的文件信息" style="border: none; outline: none; flex: 1; background: transparent; padding-left: 30px; box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);">
+                </div>
+                <button type="reset" class="btn" aria-label="重置" style="border: 1px solid #ccc; border-radius: 50px; padding: 5px 15px; background-color: #fff; cursor: pointer;">
+                    <i class="fas fa-times"></i>
+                </button>
+                <button type="submit" class="btn btn-primary" style="border-radius: 50px; padding: 5px 15px;">查询</button>
             </div>
-            <button type="submit" class="btn btn-primary">查询</button>
-            <button type="reset" class="btn btn-secondary">重置</button>
         </form>
-        <table id="fileTable" class="table table-striped">
+
+
+        <table id="fileTable" class="table table-striped" style="margin-top: 20px;">
             <thead>
             <tr>
                 <th>文件名</th>
@@ -143,6 +207,14 @@
     </div>
 </div>
 
+
+
+
+
+
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     function removeActiveClass() {
@@ -151,6 +223,15 @@
             item.classList.remove('active');
         });
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const resetButton = document.querySelector('#searchForm button[type="reset"]');
+        resetButton.addEventListener('click', function () {
+            // Clear the table body content
+            const tableBody = document.getElementById('fileTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = '';
+        });
+    });
 
     document.addEventListener('DOMContentLoaded', function () {
         const uploadLink = document.getElementById('uploadLink');
@@ -185,7 +266,16 @@
         const uploadForm = document.getElementById('uploadForm');
         uploadForm.addEventListener('submit', function (e) {
             e.preventDefault();
+
+            // Check if a file is selected
+            const fileInput = document.getElementById('file');
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert('请先选择一个文件再上传');
+                return;
+            }
+
             const formData = new FormData(this);
+
             fetch('http://localhost/file/put/', {
                 method: 'put',
                 body: formData
@@ -215,11 +305,22 @@
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
-                    console.log('文件查询成功', data.data);
+                    const baseResp = data.baseResp;
+                    if (baseResp.code !== 0) {
+                        console.error('文件查询失败', baseResp.message);
+                        alert(baseResp.message);
+                    }else{
+                        console.log('文件查询成功', data.data);
+                    }
+
                     // 清空表格现有数据
                     const tableBody = document.getElementById('fileTable').getElementsByTagName('tbody')[0];
                     tableBody.innerHTML = '';
                     const realData = data.data.files;
+                    if (realData.length === 0) {
+                        alert('没有查询到相关文件');
+                        return;
+                    }
                     // 填充表格数据
                     realData.forEach(file => {
                         const row = document.createElement('tr');
@@ -228,7 +329,7 @@
                         const operationCell = document.createElement('td');
 
                         nameCell.textContent = file.name;
-                        hashCell.textContent = file.hash;
+                        hashCell.textContent = file.hash.substring(0, 5) + '...'+ file.hash.substring(file.hash.length - 5);
 
                         const downloadButton = document.createElement('button');
                         downloadButton.textContent = '文件下载';
@@ -236,14 +337,29 @@
                         downloadButton.addEventListener('click', function () {
                             const downloadUrl = `http://localhost/file/get?hash=${file.hash}`;
                             fetch(downloadUrl)
-                                .then(response => response.blob())
-                                .then(blob => {
-                                    const url = window.URL.createObjectURL(blob);
-                                    const a = document.createElement('a');
-                                    a.href = url;
-                                    a.download = file.name;
-                                    a.click();
-                                    window.URL.revokeObjectURL(url);
+                                .then(response => {
+                                    const contentType = response.headers.get('Content-Type');
+                                    if (contentType && contentType.includes('application/json')) {
+                                        return response.json();
+                                    }
+                                    return response.blob();
+                                })
+                                .then(data => {
+                                    console.log('data.type=',data.type, data);
+                                    if (typeof data === 'object' &&!data.type) {
+                                        if (data.code !== 0) {
+                                            console.error('文件分片丢失过多，下载失败', data.message);
+                                            alert('文件损坏过多，下载失败');
+                                        }
+                                    } else {
+                                        // 处理文件下载
+                                        const url = window.URL.createObjectURL(data);
+                                        const a = document.createElement('a');
+                                        a.href = url;
+                                        a.download = file.name;
+                                        a.click();
+                                        window.URL.revokeObjectURL(url);
+                                    }
                                 })
                                 .catch(error => {
                                     console.error('文件下载失败', error);

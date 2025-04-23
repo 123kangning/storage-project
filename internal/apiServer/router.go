@@ -8,8 +8,6 @@ import (
 func InitRouter() *gin.Engine {
 	r := gin.Default()
 
-	//r.LoadHTMLGlob("amis/jssdk/home.html")
-
 	baseGroup := r.Group("/file")
 	baseGroup.GET("/search/", objects.Search)
 	baseGroup.PUT("/put/", objects.Put)
