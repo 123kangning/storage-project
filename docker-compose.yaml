@@ -24,7 +24,7 @@ services:
     environment:
       discovery.type: single-node
     volumes:
-      - ./myes/plugins:/usr/share/elasticsearch/plugins
+      - ./canal/plugins:/usr/share/elasticsearch/plugins
     ports:
       - "9200:9200" #暴露给用户
       - "9300:9300" #组件之间互联

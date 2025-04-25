@@ -19,3 +19,23 @@ CREATE TABLE IF NOT EXISTS `file`
     `update_at` DATETIME     NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 创建 user 表
+CREATE TABLE IF NOT EXISTS `user`
+(
+    `id`       BIGINT       NOT NULL auto_increment,
+    `username` VARCHAR(255) NOT NULL UNIQUE,
+    `password` VARCHAR(255) NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 创建会话表
+CREATE TABLE IF NOT EXISTS `sessions` (
+    `id` VARCHAR(255) PRIMARY KEY,
+    `user_id` INT NOT NULL,
+    `expires_at` TIMESTAMP NOT NULL
+) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 在 sessions 表为 user_id 添加索引
+CREATE INDEX idx_sessions_user_id ON sessions(user_id);
+

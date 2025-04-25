@@ -1,0 +1,1 @@
+ cloc .. --exclude_dir .idea

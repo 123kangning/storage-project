@@ -1,6 +1,7 @@
 package objects
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
@@ -9,19 +10,22 @@ import (
 	"net/url"
 	"os"
 	"storage/infra/dal"
+	"storage/infra/myes"
 	"storage/internal/apiServer/heartbeat"
 	"storage/internal/apiServer/locate"
 	rs2 "storage/internal/pkg/rs"
-	"storage/myes"
+	"strconv"
 	"time"
 )
 
 type File struct {
 	Name string `json:"name"`
 	Hash string `json:"hash"`
+	Size int32  `json:"size"`
 }
 type SearchResponseData struct {
 	Files []File `json:"files"`
+	Total int64  `json:"total"`
 }
 type SearchResponse struct {
 	BaseResp `json:"baseResp"`
@@ -31,6 +35,18 @@ type SearchResponse struct {
 // Search es查询
 func Search(c *gin.Context) {
 	name := c.Query("name")
+	// 获取分页参数，默认从第 1 条开始，每页 10 条记录
+	fromStr := c.DefaultQuery("from", "1")
+	sizeStr := c.DefaultQuery("size", "10")
+	from, err := strconv.Atoi(fromStr)
+	if err != nil {
+		from = 1
+	}
+	size, err := strconv.Atoi(sizeStr)
+	if err != nil {
+		size = 10
+	}
+
 	fmt.Println("name=", name)
 	resp := SearchResponse{
 		Data: SearchResponseData{
@@ -41,7 +57,9 @@ func Search(c *gin.Context) {
 			Message: "success",
 		},
 	}
-	files, err := myes.GetFile(name)
+	from = (from - 1) * size
+	files, total, err := myes.GetFile(name, from, size)
+	resp.Data.Total = total
 	if err != nil {
 		resp.BaseResp.Set(1, err.Error())
 		log.Println("err = ", err)
@@ -52,6 +70,7 @@ func Search(c *gin.Context) {
 		resp.Data.Files = append(resp.Data.Files, File{
 			Name: file.Name,
 			Hash: file.Hash,
+			Size: file.Size,
 		})
 	}
 	c.JSON(http.StatusOK, resp)
@@ -106,7 +125,8 @@ func Get(c *gin.Context) {
 func GetStream(hash string, size int64) (*rs2.RSGetStream, error) {
 	locateInfo := locate.Locate(hash)
 	if len(locateInfo) < rs2.DATA_SHARDS { // 如果定位的数据服务节点数少于数据恢复的最低数量，则无法恢复完整数据，返回定位失败错误
-		return nil, fmt.Errorf("object %s locate fail, result %v", hash, locateInfo)
+		log.Println("object", hash, "locate fail , locateInfo=", locateInfo)
+		return nil, errors.New("文件分片丢失过多，下载失败")
 	}
 	// 选择数据服务节点，用于数据恢复
 	dataServers := make([]string, 0)

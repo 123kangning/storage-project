@@ -31,8 +31,7 @@ func init() {
 		)
 		if err != nil {
 			log.Println("ExchangeDeclare err=", err)
-		} else {
-			log.Println("ExchangeDeclare success ,", exchange)
+			panic(err)
 		}
 	}
 }
