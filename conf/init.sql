@@ -9,7 +9,7 @@ GRANT ALL PRIVILEGES ON file.* TO 'file'@'%';
 FLUSH PRIVILEGES;
 
 use file;
-CREATE TABLE IF NOT EXISTS `file`
+CREATE TABLE IF NOT EXISTS `files`
 (
     `id`        BIGINT       NOT NULL auto_increment,
     `name`      VARCHAR(255) NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `file`
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- 创建 user 表
-CREATE TABLE IF NOT EXISTS `user`
+CREATE TABLE IF NOT EXISTS `users`
 (
     `id`       BIGINT       NOT NULL auto_increment,
     `username` VARCHAR(255) NOT NULL UNIQUE,
