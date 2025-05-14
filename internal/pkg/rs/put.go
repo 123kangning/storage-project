@@ -3,7 +3,6 @@ package rs
 import (
 	"fmt"
 	"io"
-	"log"
 	"storage/internal/pkg/objectstream"
 )
 
@@ -11,8 +10,7 @@ type RSPutStream struct {
 	*encoder
 }
 
-func NewRSPutStream(dataServers []string, hash string, size int64) (*RSPutStream, error) {
-	log.Println("api.objects.NewRSPutStream")
+func NewRSPutStream(dataServers []string, hash string, size int) (*RSPutStream, error) {
 	if len(dataServers) != ALL_SHARDS { // 如果参数中的数据服务节点数量小于最低标准，则无法存储数据
 		return nil, fmt.Errorf("dataServers number mismatch")
 	}

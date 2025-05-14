@@ -14,8 +14,8 @@ type TempPutStream struct {
 }
 
 // NewTempPutStream 向dataServer的/temp发送POST请求，创建文件（不写入内容），object为[hash.writer分片索引]
-func NewTempPutStream(server, object string, size int64) (*TempPutStream, error) {
-	log.Println("api.objects.NewTempPutStream")
+func NewTempPutStream(server, object string, size int) (*TempPutStream, error) {
+	log.Println("POST", server, object)
 	request, e := http.NewRequest("POST", "http://"+server+"/temp/"+object, nil)
 	if e != nil {
 		return nil, e
@@ -35,6 +35,7 @@ func NewTempPutStream(server, object string, size int64) (*TempPutStream, error)
 
 // 向dataServer发送patch请求，将传入的[]byte作为该请求的消息体
 func (w *TempPutStream) Write(p []byte) (n int, err error) {
+	log.Println("PATCH", w.Server)
 	request, e := http.NewRequest("PATCH", "http://"+w.Server+"/temp/"+w.Uuid, strings.NewReader(string(p)))
 	if e != nil {
 		return 0, e
@@ -56,6 +57,7 @@ func (w *TempPutStream) Commit(good bool) {
 	if good {
 		method = "PUT"
 	}
+	log.Println(method, w.Server)
 	request, _ := http.NewRequest(method, "http://"+w.Server+"/temp/"+w.Uuid, nil)
 	client := http.Client{}
 	client.Do(request)

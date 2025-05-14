@@ -11,9 +11,10 @@ import (
 )
 
 type EsFile struct {
-	Hash string `json:"hash"`
-	Name string `json:"name"`
-	Size int32  `json:"size"`
+	Hash   string `json:"hash"`
+	Name   string `json:"name"`
+	Size   int    `json:"size"`
+	Source int64  `json:"source"`
 }
 
 var (
@@ -31,6 +32,10 @@ var (
 		  "size": {
 			"type": "integer",
 			"index": false
+		  },
+          "source": {
+			"type": "long",
+			"index": true
 		  },
 		  "hash": {
 			"type": "keyword",
@@ -73,8 +78,8 @@ func creatIndex() {
 }
 
 // AddFile 新增文件
-func AddFile(size int32, id int64, name, hash string) (err error) {
-	file := EsFile{Name: name, Hash: hash, Size: size}
+func AddFile(size int, id int64, name, hash string, source int64) (err error) {
+	file := EsFile{Name: name, Hash: hash, Size: size, Source: source}
 	log.Println("AddFile client = ", client, " ctx = ", ctx)
 	post, err := client.Index().Index(fileIndex).BodyJson(file).Id(strconv.Itoa(int(id))).Do(ctx)
 	if err != nil {
@@ -85,26 +90,33 @@ func AddFile(size int32, id int64, name, hash string) (err error) {
 	return nil
 }
 
-// PutFile 更新文件，暂不使用
-func PutFile(id int, name string) (err error) {
-	_, err = client.Update().
-		Index(fileIndex).
-		Id(strconv.Itoa(id)).
-		Doc(map[string]string{"name": name}).
-		Do(context.Background())
+func UpdateFile(id, source int64, size int, name, hash string) (err error) {
+	file := EsFile{Name: name, Hash: hash, Size: size, Source: source}
+	update, err := client.Update().Index(fileIndex).Id(strconv.Itoa(int(id))).Doc(file).Do(ctx)
 	if err != nil {
-		return err
+		log.Println("UpdateFile err = ", err)
 	}
+	log.Println("UpdateFile success, update = ", update)
 	return nil
 }
 
 // GetFile 按照name作为索引返回分页后的元数据
-func GetFile(name string, from int, size int) (files []*EsFile, total int64, err error) {
+func GetFile(name string, from, size int, source int64) (files []*EsFile, total int64, err error) {
 	// 构建查询条件
-	termQuery := elastic.NewTermsQuery("name", name)
+	boolQuery := elastic.NewBoolQuery()
+
+	// 当name非空时添加模糊匹配条件
+	if name != "" {
+		boolQuery.Must(elastic.NewMatchQuery("name", name))
+	}
+
+	// 当source非0时添加精确匹配条件
+	if source != 0 {
+		boolQuery.Must(elastic.NewTermQuery("source", source))
+	}
 	// 执行 count 查询
 	fmt.Println("client=", client, "ctx=", ctx)
-	count, err := client.Count(fileIndex).Query(termQuery).Do(ctx)
+	count, err := client.Count(fileIndex).Query(boolQuery).Do(ctx)
 	if err != nil {
 		log.Println("Error counting documents: ", err)
 		return nil, 0, errors.New(fmt.Sprintf("Error counting documents: %s ", err))
@@ -113,7 +125,7 @@ func GetFile(name string, from int, size int) (files []*EsFile, total int64, err
 
 	// 执行搜索查询
 	result, err := client.Search(fileIndex).
-		Query(termQuery).
+		Query(boolQuery).
 		From(from). // 设置起始位置
 		Size(size). // 设置每页大小
 		Do(ctx)

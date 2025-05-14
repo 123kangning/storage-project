@@ -17,9 +17,9 @@ func InitRouter() *gin.Engine {
 		baseGroup.Use(middleware.SessionAuth())
 		baseGroup.GET("/search/", objects.Search)
 		baseGroup.POST("/post/", objects.Post)
-		baseGroup.GET("/get/", objects.Get)
+		baseGroup.GET("/get/", objects.Down)
 		baseGroup.DELETE("/del/", objects.Del)
-		baseGroup.GET("/", objects.Home)
+		baseGroup.GET("/list", objects.GetUserUploadedFiles)
 	}
 
 	userGroup := v1.Group("/user")

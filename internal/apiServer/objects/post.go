@@ -26,6 +26,20 @@ func Post(c *gin.Context) {
 	log.Println("api.object.put")
 	resp := &BaseResp{}
 
+	// 获取用户 ID
+	userID, exists := c.Get("userID")
+	if !exists {
+		resp.Set(1, "未获取到用户 ID")
+		c.JSON(http.StatusUnauthorized, resp)
+		return
+	}
+	userIDInt64, ok := userID.(int64)
+	if !ok {
+		resp.Set(1, "用户 ID 类型错误")
+		c.JSON(http.StatusUnauthorized, resp)
+		return
+	}
+
 	file, err := c.FormFile("file")
 	if err != nil {
 		log.Println("file error , ", err)
@@ -56,12 +70,12 @@ func Post(c *gin.Context) {
 
 	resFile := dal.Get(hash)
 	if resFile.Hash == hash {
-		resp.Set(1, "file already exists")
+		resp.Set(1, "文件已存在")
 		c.JSON(http.StatusOK, resp)
 		return
 	}
 
-	code, e := storeObject(r, hash, file.Size) //存储文件到/objects,返回状态码以及error
+	code, e := storeObject(r, hash, int(file.Size)) //存储文件到/objects,返回状态码以及error
 	if e != nil || code != http.StatusOK {
 		log.Println(e)
 		resp.Set(1, e.Error())
@@ -69,8 +83,8 @@ func Post(c *gin.Context) {
 		return
 	}
 
-	name := file.Filename              //组成名字
-	e = dal.Add(name, hash, file.Size) //更新数据库
+	name := file.Filename                                //组成名字
+	e = dal.Add(name, hash, int(file.Size), userIDInt64) //更新数据库
 	if e != nil {
 		log.Println(e)
 		resp.Set(1, e.Error())
@@ -83,7 +97,7 @@ func Post(c *gin.Context) {
 }
 
 // 调用dataServer生成文件，暂时还未写入，返回writer
-func putStream(hash string, size int64) (*rs2.RSPutStream, error) {
+func putStream(hash string, size int) (*rs2.RSPutStream, error) {
 	log.Println("api.objects.putStream")
 	// 获取全部的数据服务节点，无需排除任何节点
 	servers := heartbeat.ChooseRandomDataServers(rs2.ALL_SHARDS, nil)

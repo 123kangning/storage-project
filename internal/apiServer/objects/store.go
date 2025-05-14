@@ -9,7 +9,7 @@ import (
 	"storage/internal/pkg/utils"
 )
 
-func storeObject(r io.Reader, hash string, size int64) (int, error) {
+func storeObject(r io.Reader, hash string, size int) (int, error) {
 	log.Println("api.objects.storeObject")
 	if locate.Exist(hash) { //如果该对象已经存在，直接返回
 		log.Println("api.objects.storeObject1")

@@ -3,6 +3,7 @@ package rs
 import (
 	"fmt"
 	"io"
+	"log"
 	objectstream2 "storage/internal/pkg/objectstream"
 )
 
@@ -11,7 +12,7 @@ type RSGetStream struct {
 }
 
 // NewRSGetStream 参数 locateInfo 为读取切片的数据服务节点，dataServers 为恢复切片的数据服务节点 ，hash 为数据散列值，size 为数据总长度
-func NewRSGetStream(locateInfo map[int]string, dataServers []string, hash string, size int64) (*RSGetStream, error) {
+func NewRSGetStream(locateInfo map[int]string, dataServers []string, hash string, size int) (*RSGetStream, error) {
 	if len(locateInfo)+len(dataServers) != ALL_SHARDS {
 		return nil, fmt.Errorf("dataServers number mismatch")
 	}
@@ -49,6 +50,7 @@ func NewRSGetStream(locateInfo map[int]string, dataServers []string, hash string
 
 // Close 将临时对象转正
 func (s *RSGetStream) Close() {
+	log.Println("RSGetStream Close")
 	for i := range s.writers {
 		if s.writers[i] != nil {
 			s.writers[i].(*objectstream2.TempPutStream).Commit(true)

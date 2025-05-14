@@ -1,27 +1,18 @@
 package dal
 
 import (
-	"database/sql"
-	"fmt"
-	_ "github.com/go-sql-driver/mysql"
-	"log"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 	"storage/conf"
 )
 
-var DB *sql.DB
+var DB *gorm.DB
 
 func init() {
+	dsn := conf.MySQLDefaultDSN
 	var err error
-	// 使用Open方法创建数据库连接
-	DB, err = sql.Open("mysql", conf.MySQLDefaultDSN)
+	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
-
-	// 尝试与数据库建立连接
-	err = DB.Ping()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("sql ", DB, " open success...")
 }

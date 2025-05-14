@@ -1,0 +1,257 @@
+/* 全局样式 */
+body {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background: #1395a7;
+}
+
+/* 顶部框样式 */
+#top-bar {
+    display: flex;
+    padding: 10px 20px;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    height: 80px; /* 固定高度 */
+    background: #1395a7;
+}
+.top-bar-color-btn {
+    background-color: #1395a7;
+    color: white;
+}
+#top-bar h1 {
+    margin: 0;
+    font-size: 40px;
+    font-weight: bold;
+    font-family: "Georgia", "Times New Roman", serif;
+}
+.github-link {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    /*display: flex;*/
+    align-items: center;
+    gap: 5px;
+    transition: color 0.3s ease;
+}
+
+.github-link:hover {
+    color: #63b3ed;
+}
+
+.login-btn {
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+#top-bar-left {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center;    /* Center vertically */
+    white-space: nowrap;    /* Prevent text wrapping */
+    flex: 1;                /* Allow the left section to take up available space */
+}
+
+#top-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;      /* Push the right section to the far right */
+}
+
+/* 侧边栏样式 */
+#sidebar {
+    position: fixed;
+    top: 80px; /* Matches the height of the top bar */
+    left: 0;
+    /* 调整高度，减去顶部栏和底部栏的高度 */
+    height: calc(100vh - 80px - 60px);
+    width: 200px;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000; /* Ensure it stays above other elements */
+}
+
+#sidebar.collapsed {
+    width: 60px;
+}
+
+ul li {
+    float: left; /* 使<li>标签浮动到左边 */
+    padding: 0 10px; /* 调整内边距以增加间距 */
+}
+
+#sidebar.collapsed #sidebar-header h3 {
+    opacity: 0;
+}
+
+#sidebar ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#sidebar ul li {
+    margin-bottom: 15px;
+    transition: background-color 0.3s ease;
+}
+
+#sidebar ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 15px 25px; /* 增加左右内边距让框更宽，可根据需求调整 */
+    display: flex;
+    align-items: center;
+    transition: opacity 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease; /* 添加过渡效果 */
+}
+
+#sidebar ul li:hover a {
+    background-color: #63b3ed; /* 调整鼠标悬停时的背景颜色 */
+    border-radius: 5px;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3); /* 增强阴影 */
+}
+
+#sidebar ul li a.active {
+    background-color: #63b3ed;
+    border-radius: 5px;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+}
+
+#sidebar.collapsed #sidebar ul li a span {
+    opacity: 0;
+}
+
+#sidebar ul li a i {
+    margin-right: 10px;
+}
+
+/* 主内容区域样式 */
+#main-content {
+    margin-left: 200px;
+    padding: 20px;
+    flex: 1;
+    transition: margin-left 0.3s ease; /* 添加主内容区域边距过渡效果 */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+    background-image: url('../img/d1.jpg'); /* Replace with your image path */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+/* 新增输入框和表格包装器样式 */
+.input-table-wrapper {
+    /* 适当缩小宽度 */
+    width: 80%;
+    /* 居中显示 */
+    margin: auto;
+}
+
+/* 隐藏初始的内容区域 */
+.content-section {
+    display: none;
+}
+
+.active {
+    display: block;
+}
+
+/* 美化输入框样式 */
+#uploadForm input[type="file"],
+#searchForm input[type="text"] {
+    border: 1px solid #e2e8f0; /* 修改输入框边框颜色 */
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075); /* 添加内阴影效果 */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* 添加过渡效果 */
+}
+
+.upload-dropzone {
+    border: 2px dashed #63b3ed;
+    border-radius: 10px;
+    padding: 40px;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+    max-width: 800px;
+    margin: 5vh auto;
+    background-color: rgba(255, 255, 255, 0.9); /* 添加背景颜色，设置一定透明度 */
+}
+
+.upload-dropzone:hover {
+    background-color: #f0f8ff;
+}
+
+.upload-icon {
+    font-size: 48px;
+    color: #63b3ed;
+    margin-bottom: 10px;
+}
+
+.upload-text {
+    font-size: 18px;
+    color: #333;
+}
+
+#uploadForm input[type="file"]:focus,
+#searchForm input[type="text"]:focus {
+    border-color: #63b3ed; /* 输入框聚焦时的边框颜色 */
+    box-shadow: 0 0 0 2px rgba(99, 179, 237, 0.2); /* 输入框聚焦时的外阴影效果 */
+    outline: none;
+}
+
+.reset-btn i {
+    color: #666;
+}
+
+.reset-btn:hover i {
+    color: #333;
+}
+#pagination {
+    position: fixed;
+    bottom: 61px; /* 确保在底部栏上方，根据底部栏高度调整 */
+    left: 201px; /* 确保在侧边栏右侧，根据侧边栏宽度调整 */
+    display: flex;
+    justify-content: space-between; /* 使子元素两端对齐 */
+    align-items: center;
+    gap: 10px;
+    background-color: rgba(255, 255, 255, 0.9); /* 添加背景颜色，设置一定透明度 */
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+}
+
+#pagination2 {
+    position: fixed;
+    bottom: 61px; /* 确保在底部栏上方，根据底部栏高度调整 */
+    left: 201px; /* 确保在侧边栏右侧，根据侧边栏宽度调整 */
+    display: flex;
+    justify-content: space-between; /* 使子元素两端对齐 */
+    align-items: center;
+    gap: 10px;
+    background-color: rgba(255, 255, 255, 0.9); /* 添加背景颜色，设置一定透明度 */
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+}
+
+/* 底部栏样式 */
+#footer {
+    background-color: #1395A7;
+    color: white;
+    text-align: center; /* Center horizontally */
+    padding: 10px;
+    margin-top: auto; /* Push the footer to the bottom */
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    height: 60px; /* Set a fixed height for vertical centering */
+}

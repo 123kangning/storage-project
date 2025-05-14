@@ -6,7 +6,6 @@ import (
 	"log"
 	"storage/conf"
 	"storage/infra/myes"
-	//"storage/conf"
 )
 
 type BinlogSync struct {
@@ -36,12 +35,15 @@ func (h *BinlogSync) OnRow(ev *canal.RowsEvent) error {
 	return nil
 }
 func insertFunc(ev *canal.RowsEvent) {
-	after := make(map[string]interface{})
-	for columnIndex, currColumn := range ev.Table.Columns {
-		after[currColumn.Name] = ev.Rows[0][columnIndex]
+	for _, row := range ev.Rows {
+		after := make(map[string]interface{})
+		for columnIndex, currColumn := range ev.Table.Columns {
+			after[currColumn.Name] = row[columnIndex]
+		}
+		fmt.Println(after["size"], after["id"], after["name"], after["hash"], after["source"])
+		fmt.Println(after["size"].(int32), after["id"].(int64), after["name"].(string), after["hash"].(string), after["source"].(int64))
+		myes.AddFile(int(after["size"].(int32)), after["id"].(int64), after["name"].(string), after["hash"].(string), after["source"].(int64))
 	}
-	fmt.Println(after["size"].(int32), after["id"].(int64), after["name"].(string), after["hash"].(string))
-	myes.AddFile(after["size"].(int32), after["id"].(int64), after["name"].(string), after["hash"].(string))
 }
 
 // 暂无实际用途
@@ -65,20 +67,22 @@ func updateFunc(ev *canal.RowsEvent) {
 	}
 	if before["is_delete"].(int8) == 0 && after["is_delete"].(int8) == 1 { //删除
 		myes.DeleteFile(before["id"].(int64))
-	}
-	if before["is_delete"].(int8) == 1 && after["is_delete"].(int8) == 0 { //回收
-		myes.AddFile(after["size"].(int32), after["id"].(int64), after["name"].(string), after["hash"].(string))
+	} else if before["is_delete"].(int8) == 1 && after["is_delete"].(int8) == 0 { //回收
+		myes.AddFile(int(after["size"].(int32)), after["id"].(int64), after["name"].(string), after["hash"].(string), after["source"].(int64))
+	} else {
+		myes.UpdateFile(before["id"].(int64), after["source"].(int64), int(after["size"].(int32)), after["name"].(string), after["hash"].(string))
 	}
 }
 
 func main() {
-	c, err := canal.NewCanal(&canal.Config{
-		Addr:              conf.MysqlAddr,
-		User:              "canal",
-		Password:          "canal",
-		ServerID:          conf.ServerID,
-		IncludeTableRegex: []string{"file\\.file"},
-	})
+	cfg := &canal.Config{}
+	cfg.Addr = conf.MysqlAddr
+	cfg.User = "canal"
+	cfg.Password = "canal"
+	cfg.ServerID = conf.ServerID
+	cfg.IncludeTableRegex = []string{"file\\.files"}
+
+	c, err := canal.NewCanal(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -1,6 +1,7 @@
 package rs
 
 import (
+	"errors"
 	"fmt"
 	"github.com/klauspost/reedsolomon"
 	"io"
@@ -10,14 +11,14 @@ type decoder struct {
 	readers   []io.Reader
 	writers   []io.Writer
 	enc       reedsolomon.Encoder
-	size      int64
+	size      int
 	cache     []byte
 	cacheSize int
-	total     int64
+	total     int
 }
 
 /* 构建 RS 码解码器 */
-func NewDecoder(readers []io.Reader, writers []io.Writer, size int64) *decoder {
+func NewDecoder(readers []io.Reader, writers []io.Writer, size int) *decoder {
 	enc, _ := reedsolomon.New(DATA_SHARDS, PARITY_SHARDS)
 	return &decoder{readers, writers, enc, size, nil, 0, 0}
 }
@@ -68,7 +69,7 @@ func (d *decoder) getData() error {
 				如果r返回至少读取len(buf)字节的错误，则删除该错误。
 			*/
 			n, e := io.ReadFull(d.readers[i], shards[i])
-			if e != nil && e != io.EOF && e != io.ErrUnexpectedEOF {
+			if e != nil && e != io.EOF && !errors.Is(e, io.ErrUnexpectedEOF) {
 				shards[i] = nil
 			} else if n != BLOCK_PER_SHARD {
 				shards[i] = shards[i][:n]
@@ -91,12 +92,12 @@ func (d *decoder) getData() error {
 		d.writers[id].Write(shards[id])
 	}
 	for i := 0; i < DATA_SHARDS; i++ {
-		shardSize := int64(len(shards[i]))
+		shardSize := len(shards[i])
 		if d.total+shardSize > d.size {
 			shardSize -= d.total + shardSize - d.size
 		}
 		d.cache = append(d.cache, shards[i][:shardSize]...)
-		d.cacheSize += int(shardSize)
+		d.cacheSize += shardSize
 		d.total += shardSize
 	}
 	return nil
